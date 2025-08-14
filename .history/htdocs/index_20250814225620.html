@@ -1,0 +1,104 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>allergenfreedog — Allergy Comparison Tool</title>
+<style>
+  body { font-family: system-ui, sans-serif; margin: 0; background: #fbf6ef; color: #274642; }
+  header { padding: 1rem; background: #fff; box-shadow: 0 2px 5px rgba(0,0,0,.1); display: flex; justify-content: space-between; align-items: center; }
+  h1 { font-size: 1.4rem; margin: 0; }
+  main { padding: 1rem; }
+  .flex { display: flex; gap: 1rem; }
+  .column { flex: 1; background: #fff; border-radius: 8px; padding: 1rem; box-shadow: 0 2px 5px rgba(0,0,0,.05); }
+  h2 { font-size: 1.2rem; margin-top: 0; }
+  .food-input { margin-bottom: .5rem; }
+  input, textarea { width: 100%; padding: .5rem; border: 1px solid #ccc; border-radius: 6px; }
+  button { background: #FF9F68; border: none; padding: .5rem 1rem; border-radius: 6px; color: #fff; font-weight: bold; cursor: pointer; }
+  button:hover { background: #f08040; }
+  table { width: 100%; border-collapse: collapse; margin-top: 1rem; }
+  th, td { padding: .5rem; border-bottom: 1px solid #eee; }
+  .pill { padding: 2px 6px; border-radius: 6px; font-size: .8rem; color: #fff; }
+  .danger { background: #ff5f5f; }
+  .warn { background: #ffd27a; color: #000; }
+  .ok { background: #85d1a0; }
+</style>
+</head>
+<body>
+<header>
+  <h1>allergenfreedog</h1>
+</header>
+<main>
+  <div class="flex">
+    <div class="column" id="triggeringFoodsCol">
+      <h2>Triggering Foods</h2>
+      <div id="triggeringFoods"></div>
+      <button onclick="addFood('triggeringFoods')">+ Add Triggering Food</button>
+    </div>
+    <div class="column" id="safeFoodsCol">
+      <h2>Safe Foods</h2>
+      <div id="safeFoods"></div>
+      <button onclick="addFood('safeFoods')">+ Add Safe Food</button>
+    </div>
+  </div>
+  <div style="margin-top:1rem;">
+    <button onclick="compareFoods()">Compare Foods</button>
+  </div>
+  <div id="results"></div>
+  <div id="foodTestSection" style="display:none;margin-top:1rem;">
+    <h2 style="font-size:1.1rem;">Test a New Food</h2>
+    <textarea id="newFood" rows="2" placeholder="Enter ingredients (comma separated)"></textarea>
+    <button onclick="testFood()">Check Food</button>
+    <div id="testResult"></div>
+  </div>
+</main>
+<script>
+let lastSuspects = new Set();
+
+function addFood(columnId) {
+  const div = document.createElement('div');
+  div.className = 'food-input';
+  div.innerHTML = '<textarea rows="2" placeholder="Enter ingredients (comma separated)"></textarea>';
+  document.getElementById(columnId).appendChild(div);
+}
+function parseIngredients(text) {
+  return text.split(/,|;/).map(i => i.trim().toLowerCase()).filter(Boolean);
+}
+function compareFoods() {
+  const triggering = Array.from(document.querySelectorAll('#triggeringFoods textarea')).flatMap(t => parseIngredients(t.value));
+  const safe = Array.from(document.querySelectorAll('#safeFoods textarea')).flatMap(t => parseIngredients(t.value));
+  const uniqueTriggering = new Set(triggering);
+  const uniqueSafe = new Set(safe);
+  const common = [...uniqueTriggering].filter(i => uniqueSafe.has(i));
+  const suspects = [...uniqueTriggering].filter(i => !uniqueSafe.has(i));
+  const safeOnly = [...uniqueSafe].filter(i => !uniqueTriggering.has(i));
+  lastSuspects = new Set(suspects);
+  const resultsDiv = document.getElementById('results');
+  let html = '<h2>Comparison Results</h2>';
+  html += '<table><thead><tr><th>Ingredient</th><th>Type</th></tr></thead><tbody>';
+  common.forEach(i => { html += `<tr><td>${i}</td><td><span class="pill ok">Common</span></td></tr>`; });
+  suspects.forEach(i => { html += `<tr><td>${i}</td><td><span class="pill danger">Suspect Allergen</span></td></tr>`; });
+  safeOnly.forEach(i => { html += `<tr><td>${i}</td><td><span class="pill warn">Safe Only</span></td></tr>`; });
+  html += '</tbody></table>';
+  resultsDiv.innerHTML = html;
+  document.getElementById('foodTestSection').style.display = 'block';
+}
+function testFood() {
+  const newIngredients = parseIngredients(document.getElementById('newFood').value);
+  const resultDiv = document.getElementById('testResult');
+  if (newIngredients.length === 0) {
+    resultDiv.innerHTML = '';
+    return;
+  }
+  const matches = newIngredients.filter(i => lastSuspects.has(i));
+  if (matches.length === 0) {
+    resultDiv.innerHTML = '<span class="pill ok">No suspect ingredients found</span>';
+  } else {
+    resultDiv.innerHTML = 'Contains potential allergens: ' + matches.map(i => `<span class="pill danger">${i}</span>`).join(' ');
+  }
+}
+addFood('triggeringFoods');
+addFood('safeFoods');
+</script>
+</body>
+</html>
