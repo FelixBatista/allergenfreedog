@@ -1,4 +1,4 @@
-!doctype html>
+<!doctype html>
 <html lang="en">
 <head>
   <meta charset="utf-8" />
@@ -68,6 +68,17 @@
     .chip{border:2px solid #c6dacd;border-radius:999px;padding:6px 10px;font-weight:700;color:var(--muted);cursor:pointer}
     .chip.active{background:var(--primary);border-color:var(--primary);color:#fff}
 
+    /* Food Entry Styles */
+    .foodEntry{margin-bottom:16px}
+    .foodEntry:last-child{margin-bottom:8px}
+    .foodEntry select{margin-bottom:8px}
+    .foodEntry textarea{margin-top:8px}
+    .foodEntry .btn{font-size:0.8rem;padding:4px 8px;margin-top:4px}
+
+    /* Non-similar ingredient row highlighting */
+    tr.non-similar{background-color:#fff3e0}
+    tr.non-similar:hover{background-color:#ffe0b2}
+
     footer{margin-top:40px;border-top:1px solid #e9e1d7}
     footer .inner{display:flex;flex-wrap:wrap;gap:12px;justify-content:space-between;align-items:center;padding:18px 0;color:var(--muted)}
 
@@ -84,6 +95,11 @@
     .muted{color:var(--muted)}
     .sr{position:absolute;left:-10000px}
   </style>
+  
+  <!-- Favicon and meta tags -->
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+  <link rel="alternate icon" href="/favicon.ico">
+  <meta name="theme-color" content="#79C99E">
 </head>
 <body>
   <header>
@@ -113,30 +129,29 @@
             <button type="button" class="chip" data-filter="overlap">Overlaps only</button>
           </div>
 
-          <div class="row">
+          <div class="grid">
             <div class="field">
-              <label for="p1">Food 1</label>
-              <select id="p1" aria-describedby="p1help"></select>
-              <small id="p1help" class="muted">Pick a sample or "Custom (paste)"</small>
-              <textarea id="p1txt" rows="3" placeholder="Paste ingredients separated by commas…"></textarea>
+              <label>Triggering Foods (Foods that caused problems)</label>
+              <div id="triggeringFoods">
+                <div class="foodEntry">
+                  <select class="foodSelect" aria-describedby="triggeringHelp"></select>
+                  <small class="muted">Pick a sample or "Custom (paste)"</small>
+                  <textarea class="foodText" rows="3" placeholder="Paste ingredients separated by commas…"></textarea>
+                </div>
+              </div>
+              <button type="button" class="btn ghost" id="addTriggeringFood">+ Add Another Triggering Food</button>
             </div>
+            
             <div class="field">
-              <label for="p2">Food 2</label>
-              <select id="p2" aria-describedby="p2help"></select>
-              <small id="p2help" class="muted">Optional</small>
-              <textarea id="p2txt" rows="3" placeholder="Paste ingredients separated by commas…"></textarea>
-            </div>
-          </div>
-          <div class="row">
-            <div class="field">
-              <label for="p3">Food 3</label>
-              <select id="p3"></select>
-              <textarea id="p3txt" rows="3" placeholder="Paste ingredients separated by commas…"></textarea>
-            </div>
-            <div class="field">
-              <label for="p4">Food 4</label>
-              <select id="p4"></select>
-              <textarea id="p4txt" rows="3" placeholder="Paste ingredients separated by commas…"></textarea>
+              <label>Safe Foods (Foods that didn't cause problems)</label>
+              <div id="safeFoods">
+                <div class="foodEntry">
+                  <select class="foodSelect" aria-describedby="safeHelp"></select>
+                  <small class="muted">Pick a sample or "Custom (paste)"</small>
+                  <textarea class="foodText" rows="3" placeholder="Paste ingredients separated by commas…"></textarea>
+                </div>
+              </div>
+              <button type="button" class="btn ghost" id="addSafeFood">+ Add Another Safe Food</button>
             </div>
           </div>
 
@@ -159,10 +174,12 @@
       <aside class="card">
         <h2>How it works</h2>
         <ol>
-          <li>Pick a sample product or paste its ingredient list.</li>
+          <li><strong>Triggering Foods:</strong> Add foods your dog ate that caused problems (allergies, upset stomach, etc.)</li>
+          <li><strong>Safe Foods:</strong> Add foods your dog ate without any issues</li>
           <li>We normalise common ingredient names using an internal list.</li>
-          <li>We flag allergens (gluten, poultry, soy, peas, fish, yeast, etc.).</li>
-          <li>We build a comparison table showing overlaps and notes.</li>
+          <li>We identify "non-similar ingredients" - ingredients present in triggering foods but NOT in safe foods.</li>
+          <li>We build a comparison table showing overlaps and allergen notes.</li>
+          <li><strong>Safe Food Finder:</strong> After comparison, test new dog foods to see if they contain any "non-similar ingredients" that could cause problems.</li>
         </ol>
         <p class="muted">Tip: hydrolysed proteins are treated as low risk if you toggle it on.</p>
       </aside>
@@ -178,6 +195,46 @@
       </div>
       <div style="overflow:auto">
         <table id="compareTable"></table>
+      </div>
+    </section>
+
+    <section class="card" id="safeFoodFinder" aria-live="polite" style="margin-top:18px; display: none;">
+      <h2>Safe Food Finder</h2>
+      <p class="muted">Test a new dog food to see if it contains any ingredients that could cause problems for your dog.</p>
+      
+      <div class="row">
+        <div class="field">
+          <label for="newFoodName">Food Name</label>
+          <input type="text" id="newFoodName" placeholder="Enter the name of the food to test">
+        </div>
+        <div class="field">
+          <label for="newFoodIngredients">Ingredients</label>
+          <textarea id="newFoodIngredients" rows="3" placeholder="Paste ingredients separated by commas…"></textarea>
+        </div>
+      </div>
+      
+      <div class="field" style="text-align:right">
+        <button type="button" class="btn primary" id="testNewFood">Test Food Safety</button>
+      </div>
+      
+      <div id="safetyResult" style="margin-top: 16px; display: none;">
+        <h3 id="safetyTitle"></h3>
+        <div id="safetyDetails"></div>
+        <div id="ingredientTable" style="margin-top: 16px; display: none;">
+          <h4>Ingredient Analysis</h4>
+          <div style="overflow: auto;">
+            <table style="width: 100%; border-collapse: collapse;">
+              <thead>
+                <tr>
+                  <th style="padding: 12px 10px; border-bottom: 1px solid #eee; background: #f8faf7; text-align: left;">Ingredient Name</th>
+                  <th style="padding: 12px 10px; border-bottom: 1px solid #eee; background: #f8faf7; text-align: left;">Status</th>
+                  <th style="padding: 12px 10px; border-bottom: 1px solid #eee; background: #f8faf7; text-align: left;">Similar To (if problematic)</th>
+                </tr>
+              </thead>
+              <tbody id="ingredientTableBody"></tbody>
+            </table>
+          </div>
+        </div>
       </div>
     </section>
   </main>
@@ -207,97 +264,137 @@
   </div>
 
   <script>
-    // --- Sample catalog (can be replaced with real DB later) ---
-    const CATALOG = {
-      "Insect & Pea": "dehydrated insect, yellow peas, dried apple pulp, coconut oil, pea protein, linseed, calcium carbonate, dried algae (schizochytrium), pea flour, hydrolyzed yeasts, yeast extract, beta-glucans, dried sea buckthorn, fructo-oligosaccharides, mojave yucca, lactobacillus helveticus, minerals",
-      "Poultry Senior Large Breed": "dehydrated poultry proteins, animal fats, maize, wheat meal, wheat flour, barley, maize gluten, wheat gluten, hydrolysed animal proteins, beet pulp, minerals, fish oil, soya oil, yeast products, psyllium husks and seeds, fructo-oligosaccharides, algal oil (schizochytrium), glucosamine, hydrolysed cartilage",
-      "Salmon & Pea": "dehydrated salmon, yellow peas, hydrolysed salmon protein, buckwheat, coconut oil, apple pulp, salmon oil, hydrolysed salmon gravy, minerals, dried algae (ascophyllum), yeast extract, beta-glucans, dried sea buckthorn, fructo-oligosaccharides, mojave yucca"
-    };
+    // Global variables
+    let nonSimilarIngredients = [];
+    let triggeringFoodsData = [];
+    let foodCatalog = [];
+    let ingredientMaster = [];
 
-    // --- Normalisation & tags ---
-    const MASTER = [
-      {name:"wheat", tags:["gluten"], note:"Gluten cereal"},
-      {name:"wheat gluten", tags:["gluten"], note:"Gluten protein"},
-      {name:"barley", tags:["gluten"], note:"Gluten cereal"},
-      {name:"rye", tags:["gluten"], note:"Gluten cereal"},
-      {name:"maize", aliases:["corn"], tags:["possible"], note:"Some dogs sensitive"},
-      {name:"soya", aliases:["soy"], tags:["possible"], note:"Legume; known allergen for some"},
-      {name:"pea", aliases:["yellow peas","pea flour","pea protein"], tags:["possible"], note:"Legume protein"},
-      {name:"buckwheat", tags:["possible"], note:"Plant pseudo-grain"},
-      {name:"yeast", aliases:["yeast extract","hydrolyzed yeasts","yeast products"], tags:["possible"], note:"Can bother yeast‑sensitive dogs"},
-      {name:"salmon", aliases:["salmon oil","hydrolysed salmon protein","hydrolysed salmon gravy"], tags:["possible"], note:"Fish protein/fat"},
-      {name:"fish oil", tags:["possible"], note:"Fish source"},
-      {name:"poultry", aliases:["dehydrated poultry proteins","poultry digest","poultry fat"], tags:["danger"], note:"Chicken/turkey family"},
-      {name:"chicken", tags:["danger"], note:"Poultry"},
-      {name:"animal fat", tags:["possible"], note:"May carry trace proteins depending on refinement"},
-      {name:"glucosamine", tags:[], note:"Joint support"},
-      {name:"hydrolysed animal proteins", tags:["low"], note:"Hydrolysed — reduced allergenicity"},
-      {name:"hydrolyzed", tags:["low"], note:"Hydrolysed marker"},
-      {name:"insect", tags:[], note:"Novel protein"},
-      {name:"algae", aliases:["schizochytrium","ascophyllum"], tags:[], note:"Omega‑3/trace"},
-      {name:"coconut oil", tags:[], note:"Fat source"},
-      {name:"linseed", tags:[], note:"Omega‑3 plant"},
-      {name:"lactobacillus", tags:[], note:"Probiotic"},
-      {name:"fructo-oligosaccharides", tags:[], note:"Prebiotic"},
-      {name:"beta-glucans", tags:[], note:"Immune/prebiotic"},
-      {name:"psyllium", tags:[], note:"Fibre"},
-      {name:"beet pulp", tags:[], note:"Fibre"},
-      {name:"apple pulp", tags:[], note:"Fibre"},
-      {name:"minerals", tags:[], note:"Trace elements"},
-    ];
-
-    const HYDRO = /hydroly(s|z)ed|hydroly(s|z)sed/; // basic detector
-
-    function stdName(raw){
-      let s = raw.toLowerCase().trim();
-      // remove %, parentheses content
-      s = s.replace(/\(.*?\)/g, '').replace(/\d+%/g,'').replace(/\s+/g,' ').trim();
-      // try alias mapping
-      for(const m of MASTER){
-        const terms = [m.name, ...(m.aliases||[])];
-        for(const t of terms){ if(s.includes(t)) return m.name; }
+    // Initialize the application
+    async function initializeApp() {
+      try {
+        await Promise.all([
+          loadFoodCatalog(),
+          loadIngredientMaster()
+        ]);
+        
+        initializeFoodEntries();
+        console.log('Application initialized successfully');
+      } catch (error) {
+        console.error('Failed to initialize application:', error);
+        showError('Failed to load application data. Please refresh the page.');
       }
-      return s;
     }
 
-    function tagsFor(name){
-      const m = MASTER.find(x=>x.name===name);
-      return m ? m.tags : [];
+    // Load food catalog from API
+    async function loadFoodCatalog() {
+      try {
+        const response = await fetch('api/food_catalog.php');
+        const result = await response.json();
+        
+        if (result.success) {
+          foodCatalog = result.data;
+        } else {
+          throw new Error(result.message || 'Failed to load food catalog');
+        }
+      } catch (error) {
+        console.error('Error loading food catalog:', error);
+        throw error;
+      }
     }
 
-    function noteFor(name){
-      const m = MASTER.find(x=>x.name===name);
-      return m ? m.note : '';
+    // Load ingredient master list from API
+    async function loadIngredientMaster() {
+      try {
+        const response = await fetch('api/ingredients.php');
+        const result = await response.json();
+        
+        if (result.success) {
+          ingredientMaster = result.data;
+        } else {
+          throw new Error(result.message || 'Failed to load ingredient master list');
+        }
+      } catch (error) {
+        console.error('Error loading ingredient master list:', error);
+        throw error;
+      }
     }
 
-    function parseList(text){
-      return text.split(/,|;|\n/).map(x=>x.trim()).filter(Boolean);
+    // Initialize food entry functionality
+    function initializeFoodEntries() {
+      // Set up initial food entries
+      setupFoodEntry(document.querySelector('#triggeringFoods .foodEntry'), 'Sample Brand - Insect & Pea');
+      setupFoodEntry(document.querySelector('#safeFoods .foodEntry'), '(none)');
+      
+      // Add event listeners for adding new foods
+      document.getElementById('addTriggeringFood').addEventListener('click', () => addNewFood('triggeringFoods'));
+      document.getElementById('addSafeFood').addEventListener('click', () => addNewFood('safeFoods'));
     }
 
-    function buildOptions(sel){
-      const el = document.getElementById(sel);
-      const options = ["(none)", ...Object.keys(CATALOG), "Custom (paste)"];
-      options.forEach(o=>{
+    function setupFoodEntry(entry, defaultValue) {
+      const select = entry.querySelector('.foodSelect');
+      const textarea = entry.querySelector('.foodText');
+      
+      // Build options for this select
+      const options = ["(none)", ...foodCatalog.map(f => `${f.brand} - ${f.name}`), "Custom (paste)"];
+      options.forEach(o => {
         const op = document.createElement('option');
-        op.value = o; op.textContent = o; el.append(op);
+        op.value = o; 
+        op.textContent = o; 
+        select.append(op);
       });
-      el.value = sel==='p1' ? "Insect & Pea" : "(none)";
-    }
-
-    ['p1','p2','p3','p4'].forEach(buildOptions);
-
-    function syncTextarea(id){
-      const sel = document.getElementById(id);
-      const ta = document.getElementById(id+'txt');
-      function update(){
-        const v = sel.value;
-        if(CATALOG[v]){ ta.value = CATALOG[v]; ta.disabled=false; }
-        else if(v==="(none)"){ ta.value=''; ta.disabled=true; }
-        else { ta.placeholder = 'Paste ingredients separated by commas…'; ta.disabled=false; }
+      
+      select.value = defaultValue;
+      
+      // Set up change handler
+      function updateTextarea() {
+        const v = select.value;
+        if(v !== "(none)" && v !== "Custom (paste)") {
+          // Extract the food name from "Brand - Food Name" format
+          const foodName = v.split(' - ').slice(1).join(' - ');
+          const selectedFood = foodCatalog.find(f => f.name === foodName);
+          if(selectedFood) {
+            textarea.value = selectedFood.ingredients;
+            textarea.disabled = false;
+          }
+        }
+        else if(v==="(none)"){ 
+          textarea.value = ''; 
+          textarea.disabled = true; 
+        }
+        else { 
+          textarea.value = '';
+          textarea.placeholder = 'Paste ingredients separated by commas…'; 
+          textarea.disabled = false; 
+        }
       }
-      sel.addEventListener('change', update); update();
+      
+      select.addEventListener('change', updateTextarea);
+      updateTextarea();
     }
-    ['p1','p2','p3','p4'].forEach(syncTextarea);
+
+    function addNewFood(containerId) {
+      const container = document.getElementById(containerId);
+      const newEntry = document.createElement('div');
+      newEntry.className = 'foodEntry';
+      newEntry.style.marginTop = '12px';
+      
+      newEntry.innerHTML = `
+        <div style="display: flex; gap: 8px; align-items: center;">
+          <select class="foodSelect"></select>
+          <button type="button" class="btn ghost" style="padding: 4px 8px; font-size: 0.8rem;" onclick="removeFoodEntry(this)">Remove</button>
+        </div>
+        <small class="muted">Pick a sample or "Custom (paste)"</small>
+        <textarea class="foodText" rows="3" placeholder="Paste ingredients separated by commas…"></textarea>
+      `;
+      
+      container.appendChild(newEntry);
+      setupFoodEntry(newEntry, '(none)');
+    }
+
+    function removeFoodEntry(button) {
+      button.closest('.foodEntry').remove();
+    }
 
     // Filters
     let currentFilter = 'showAll';
@@ -309,40 +406,56 @@
     });
 
     function collectProducts(){
-      const picks = [];
-      for(const id of ['p1','p2','p3','p4']){
-        const name = document.getElementById(id).value;
-        const txt = document.getElementById(id+'txt').value.trim();
-        if(name!=="(none)" && txt){ picks.push({label:name, list:parseList(txt)}); }
-      }
-      return picks;
+      const triggering = [];
+      const safe = [];
+      
+      // Collect triggering foods
+      document.querySelectorAll('#triggeringFoods .foodEntry').forEach(entry => {
+        const selectValue = entry.querySelector('.foodSelect').value;
+        const txt = entry.querySelector('.foodText').value.trim();
+        if(selectValue !== "(none)" && txt){ 
+          // Extract food name from "Brand - Food Name" format
+          const foodName = selectValue.split(' - ').slice(1).join(' - ');
+          triggering.push({label: `Triggering: ${foodName}`, list: parseList(txt)}); 
+        }
+      });
+      
+      // Collect safe foods
+      document.querySelectorAll('#safeFoods .foodEntry').forEach(entry => {
+        const selectValue = entry.querySelector('.foodSelect').value;
+        const txt = entry.querySelector('.foodText').value.trim();
+        if(selectValue !== "(none)" && txt){ 
+          // Extract food name from "Brand - Food Name" format
+          const foodName = selectValue.split(' - ').slice(1).join(' - ');
+          safe.push({label: `Safe: ${foodName}`, list: parseList(txt)}); 
+        }
+      });
+      
+      return { triggering, safe };
     }
 
-    function normaliseLists(picks){
-      // Map each product to a Set of normalised ingredient names
-      const norm = {};
-      for(const p of picks){
-        const items = new Set(p.list.map(stdName));
-        norm[p.label] = items;
-      }
-      return norm;
-    }
-
-    function unionIngredients(norm){
-      const u = new Set();
-      Object.values(norm).forEach(set=>set.forEach(x=>u.add(x)));
-      return Array.from(u).sort();
+    function parseList(text){
+      return text.split(/,|;|\n/).map(x=>x.trim()).filter(Boolean);
     }
 
     function allergenClass(name, prefs){
-      const lowHydro = prefs.hydro && HYDRO.test(name);
-      const t = tagsFor(name);
-      if(prefs.noGluten && t.includes('gluten')) return 'danger';
+      const lowHydro = prefs.hydro && /hydroly(s|z)ed|hydroly(s|z)sed/.test(name);
+      const ingredient = ingredientMaster.find(im => im.name === name);
+      
+      if (!ingredient) return 'ok';
+      
+      const tags = ingredient.tags || [];
+      if(prefs.noGluten && tags.includes('gluten')) return 'danger';
       if(prefs.noPoultry && (name.includes('poultry') || name.includes('chicken'))) return 'danger';
       if(lowHydro) return 'ok';
-      if(t.includes('danger')) return 'danger';
-      if(t.includes('possible')) return 'warn';
+      if(ingredient.risk_level === 'danger') return 'danger';
+      if(ingredient.risk_level === 'warn') return 'warn';
       return 'ok';
+    }
+
+    function noteFor(name){
+      const ingredient = ingredientMaster.find(im => im.name === name);
+      return ingredient ? ingredient.note : '';
     }
 
     function applyRowFilter(){
@@ -355,48 +468,218 @@
       });
     }
 
-    document.getElementById('compare').addEventListener('submit', (e)=>{
+    // Handle form submission
+    document.getElementById('compare').addEventListener('submit', async (e)=>{
       e.preventDefault();
+      
       const prefs = {
         noGluten: document.getElementById('noGluten').checked,
         noPoultry: document.getElementById('noPoultry').checked,
         hydro: document.getElementById('hydrolysedLow').checked
       };
 
-      const picks = collectProducts();
-      if(!picks.length){ alert('Please select or paste at least one product.'); return; }
-      const norm = normaliseLists(picks);
-      const union = unionIngredients(norm);
+      const { triggering, safe } = collectProducts();
+      if(!triggering.length){ alert('Please add at least one triggering food.'); return; }
+      if(!safe.length){ alert('Please add at least one safe food.'); return; }
+      
+      try {
+        // Show loading state
+        const submitBtn = document.querySelector('#compare button[type="submit"]');
+        const originalText = submitBtn.textContent;
+        submitBtn.textContent = 'Analyzing...';
+        submitBtn.disabled = true;
+        
+        // Prepare data for API
+        const apiData = {
+          triggering: triggering.map(f => ({ name: f.label, ingredients: f.list.join(', ') })),
+          safe: safe.map(f => ({ name: f.label, ingredients: f.list.join(', ') }))
+        };
+        
+        // Call comparison API
+        const response = await fetch('api/compare.php', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(apiData)
+        });
+        
+        const result = await response.json();
+        
+        if (!result.success) {
+          throw new Error(result.message || 'Comparison failed');
+        }
+        
+        // Store triggering foods data for safe food finder
+        triggeringFoodsData = triggering;
+        nonSimilarIngredients = result.data.nonSimilarIngredients;
+        
+        // Build and display comparison table
+        displayComparisonTable(result.data.comparisonTable, triggering, safe, prefs);
+        
+        // Show the safe food finder
+        document.getElementById('safeFoodFinder').style.display = 'block';
+        
+      } catch (error) {
+        console.error('Comparison failed:', error);
+        alert('Comparison failed: ' + error.message);
+      } finally {
+        // Restore button state
+        const submitBtn = document.querySelector('#compare button[type="submit"]');
+        submitBtn.textContent = originalText;
+        submitBtn.disabled = false;
+      }
+    });
 
-      // Build table
+    function displayComparisonTable(comparisonData, triggering, safe, prefs) {
+      const allFoods = [...triggering, ...safe];
       const tbl = document.getElementById('compareTable');
-      const cols = ['Ingredient', ...picks.map(p=>p.label), 'Allergen note'];
+      const cols = ['Ingredient', ...allFoods.map(p=>p.label), 'Allergen note'];
       tbl.innerHTML = '<thead><tr>' + cols.map(c=>`<th>${c}</th>`).join('') + '</tr></thead><tbody></tbody>';
       const body = tbl.querySelector('tbody');
 
-      union.forEach(name=>{
+      comparisonData.forEach(rowData => {
+        const name = rowData.ingredient;
+        
         // presence per product
-        let count = 0; const cells = picks.map(p=>{
-          const hit = norm[p.label].has(name);
+        let count = 0; 
+        const cells = allFoods.map(p => {
+          const hit = rowData.presence[p.label];
           if(hit) count++; 
           return `<td>${hit ? '✅' : ''}</td>`;
         });
+        
         // allergen note & class
         const risk = allergenClass(name, prefs);
         const cls = risk==='danger' ? 'pill danger' : risk==='warn' ? 'pill warn' : 'pill ok';
         const note = [noteFor(name) || ''].filter(Boolean).join(' ');
-        const row = document.createElement('tr');
-        row.className = 'hover';
-        row.dataset.count = count;
-        row.dataset.risk = risk;
-        row.innerHTML = `<td><strong>${name}</strong></td>${cells.join('')}<td><span class="${cls}">${risk.toUpperCase()}</span> ${note}</td>`;
-        body.append(row);
+        
+        // non-similar indicator
+        const isNonSimilar = nonSimilarIngredients.includes(name);
+        
+        const tableRow = document.createElement('tr');
+        tableRow.className = 'hover';
+        if (isNonSimilar) {
+          tableRow.classList.add('non-similar');
+        }
+        tableRow.dataset.count = count;
+        tableRow.dataset.risk = risk;
+        
+        // Put warning pill after the ingredient name
+        const ingredientName = isNonSimilar ? 
+          `<strong>${name}</strong> <span class="pill danger" style="margin-left: 8px;">⚠️ NON-SIMILAR</span>` : 
+          `<strong>${name}</strong>`;
+        
+        tableRow.innerHTML = `<td>${ingredientName}</td>${cells.join('')}<td><span class="${cls}">${risk.toUpperCase()}</span> ${note}</td>`;
+        body.append(tableRow);
       });
 
       document.getElementById('legend').hidden = false;
-      document.getElementById('resultNote').textContent = `${union.length} unique ingredients normalised. Click column headers to sort (browser shortcuts).`;
+      document.getElementById('resultNote').textContent = `${comparisonData.length} unique ingredients normalised. Found ${nonSimilarIngredients.length} non-similar ingredients. Click column headers to sort (browser shortcuts).`;
       applyRowFilter();
+    }
+
+    // Safe Food Finder functionality
+    document.getElementById('testNewFood').addEventListener('click', async () => {
+      const foodName = document.getElementById('newFoodName').value.trim();
+      const ingredients = document.getElementById('newFoodIngredients').value.trim();
+      
+      if (!foodName || !ingredients) {
+        alert('Please enter both food name and ingredients.');
+        return;
+      }
+      
+      if (nonSimilarIngredients.length === 0) {
+        alert('Please run a comparison first to identify non-similar ingredients.');
+        return;
+      }
+      
+      try {
+        // Show loading state
+        const testBtn = document.getElementById('testNewFood');
+        const originalText = testBtn.textContent;
+        testBtn.textContent = 'Testing...';
+        testBtn.disabled = true;
+        
+        // Call safe food finder API
+        const response = await fetch('api/safe_food_finder.php', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            foodName: foodName,
+            ingredients: ingredients,
+            nonSimilarIngredients: nonSimilarIngredients
+          })
+        });
+        
+        const result = await response.json();
+        
+        if (!result.success) {
+          throw new Error(result.message || 'Food safety test failed');
+        }
+        
+        // Display results
+        displaySafeFoodResult(result.data);
+        
+      } catch (error) {
+        console.error('Safe food test failed:', error);
+        alert('Food safety test failed: ' + error.message);
+      } finally {
+        // Restore button state
+        const testBtn = document.getElementById('testNewFood');
+        testBtn.textContent = originalText;
+        testBtn.disabled = false;
+      }
     });
+
+    function displaySafeFoodResult(data) {
+      const resultDiv = document.getElementById('safetyResult');
+      const titleEl = document.getElementById('safetyTitle');
+      const detailsEl = document.getElementById('safetyDetails');
+      const ingredientTableBody = document.getElementById('ingredientTableBody');
+      
+      if (data.problematicCount > 0) {
+        titleEl.textContent = `⚠️ UNSAFE: ${data.foodName}`;
+        titleEl.style.color = '#d32f2f';
+        detailsEl.innerHTML = `
+          <p>This food contains <strong>${data.problematicCount}</strong> ingredient(s) that caused problems for your dog:</p>
+          <ul>
+            ${data.problematicIngredients.map(ingredient => `<li><strong>${ingredient}</strong></li>`).join('')}
+          </ul>
+          <p class="muted">We recommend avoiding this food.</p>
+        `;
+      } else {
+        titleEl.textContent = `✅ SAFE: ${data.foodName}`;
+        titleEl.style.color = '#2e7d32';
+        detailsEl.innerHTML = `
+          <p>This food appears to be safe for your dog!</p>
+          <p class="muted">No problematic ingredients were found that match your dog's known triggers.</p>
+        `;
+      }
+      
+      // Always show the ingredient analysis table
+      resultDiv.style.display = 'block';
+      document.getElementById('ingredientTable').style.display = 'block';
+      
+      // Populate the ingredient analysis table
+      ingredientTableBody.innerHTML = '';
+      data.ingredientAnalysis.forEach(ingredient => {
+        const row = document.createElement('tr');
+        const isNonSimilar = ingredient.status === 'Non-Similar';
+        
+        row.innerHTML = `
+          <td style="padding: 12px 10px; border-bottom: 1px solid #eee;"><strong>${ingredient.ingredient}</strong></td>
+          <td style="padding: 12px 10px; border-bottom: 1px solid #eee;"><span class="pill ${isNonSimilar ? 'danger' : 'ok'}">${ingredient.status}</span></td>
+          <td style="padding: 12px 10px; border-bottom: 1px solid #eee;">${ingredient.similarTo}</td>
+        `;
+        ingredientTableBody.appendChild(row);
+      });
+    }
+
+    // Utility function to show errors
+    function showError(message) {
+      // You can implement a proper error display system here
+      console.error(message);
+      alert(message);
+    }
 
     // --- Glossary Modal ---
     const modal = document.getElementById('glossaryModal');
@@ -410,7 +693,7 @@
     const gloss = document.getElementById('glossary');
     function renderGlossary(filter=''){
       gloss.innerHTML = '';
-      MASTER.filter(m=>m.name.includes(filter.toLowerCase())).forEach(m=>{
+      ingredientMaster.filter(m=>m.name.includes(filter.toLowerCase())).forEach(m=>{
         const card = document.createElement('div');
         card.className='gloss';
         const tag = m.tags.includes('gluten')? 'danger' : m.tags.includes('danger')? 'danger' : m.tags.includes('possible')? 'warn':'ok';
@@ -423,6 +706,9 @@
 
     // year
     document.getElementById('yr').textContent = new Date().getFullYear();
+    
+    // Initialize the app when DOM is loaded
+    document.addEventListener('DOMContentLoaded', initializeApp);
   </script>
 </body>
 </html>
