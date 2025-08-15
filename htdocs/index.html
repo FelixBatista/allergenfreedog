@@ -109,6 +109,47 @@
     /* Non-similar ingredient row highlighting */
     tr.non-similar{background-color:#fff3e0}
     tr.non-similar:hover{background-color:#ffe0b2}
+ 
+    /* Ingredient Auto-suggestion Styles */
+    .ingredient-suggestions {
+      position: absolute;
+      background: white;
+      border: 2px solid var(--primary);
+      border-radius: 8px;
+      box-shadow: var(--shadow);
+      max-height: 200px;
+      overflow-y: auto;
+      z-index: 100;
+      width: 100%;
+      display: none;
+    }
+    
+    .ingredient-suggestion-item {
+      padding: 8px 12px;
+      cursor: pointer;
+      border-bottom: 1px solid #eee;
+      transition: background-color 0.2s;
+    }
+    
+    .ingredient-suggestion-item:hover {
+      background-color: var(--primary);
+      color: white;
+    }
+    
+    .ingredient-suggestion-item:last-child {
+      border-bottom: none;
+    }
+    
+    .suggestion-highlight {
+      background-color: var(--accent);
+      color: white;
+      padding: 1px 2px;
+      border-radius: 2px;
+    }
+    
+    .foodEntry {
+      position: relative;
+    }
 
     footer{margin-top:40px;border-top:1px solid #e9e1d7}
     footer .inner{display:flex;flex-wrap:wrap;gap:12px;justify-content:space-between;align-items:center;padding:18px 0;color:var(--muted)}
@@ -193,6 +234,7 @@
                   <select class="foodSelect" aria-describedby="triggeringHelp"></select>
                   <small class="muted">Pick a sample or "Custom (paste)"</small>
                   <textarea class="foodText" rows="3" placeholder="Paste ingredients separated by commas…"></textarea>
+                  <div class="ingredient-suggestions" id="triggeringSuggestions"></div>
                 </div>
               </div>
               <button type="button" class="btn ghost" id="addTriggeringFood">+ Add Another Triggering Food</button>
@@ -205,6 +247,7 @@
                   <select class="foodSelect" aria-describedby="safeHelp"></select>
                   <small class="muted">Pick a sample or "Custom (paste)"</small>
                   <textarea class="foodText" rows="3" placeholder="Paste ingredients separated by commas…"></textarea>
+                  <div class="ingredient-suggestions" id="safeSuggestions"></div>
                 </div>
               </div>
               <button type="button" class="btn ghost" id="addSafeFood">+ Add Another Safe Food</button>
@@ -266,6 +309,7 @@
         <div class="field">
           <label for="newFoodIngredients">Ingredients</label>
           <textarea id="newFoodIngredients" rows="3" placeholder="Paste ingredients separated by commas…"></textarea>
+          <div class="ingredient-suggestions" id="newFoodSuggestions"></div>
         </div>
       </div>
       
@@ -385,11 +429,117 @@
       // Add event listeners for adding new foods
       document.getElementById('addTriggeringFood').addEventListener('click', () => addNewFood('triggeringFoods'));
       document.getElementById('addSafeFood').addEventListener('click', () => addNewFood('safeFoods'));
+      
+      // Set up ingredient suggestions for safe food finder
+      setupIngredientSuggestions('newFoodIngredients', 'newFoodSuggestions');
+    }
+
+    function setupIngredientSuggestions(textareaId, suggestionsId) {
+      const textarea = document.getElementById(textareaId);
+      const suggestionsDiv = document.getElementById(suggestionsId);
+      
+      textarea.addEventListener('input', (e) => {
+        const query = e.target.value.toLowerCase();
+        if (query.length < 2) {
+          suggestionsDiv.style.display = 'none';
+          return;
+        }
+        
+        // Get the last word being typed (for comma-separated lists)
+        const words = query.split(/[,\n]/);
+        const lastWord = words[words.length - 1].trim();
+        
+        if (lastWord.length < 2) {
+          suggestionsDiv.style.display = 'none';
+          return;
+        }
+        
+        // Find matching ingredients from master list
+        const matches = ingredientMaster
+          .filter(ingredient => cleanIngredientName(ingredient.name).includes(lastWord))
+          .slice(0, 8); // Limit to 8 suggestions
+        
+        renderIngredientSuggestions(matches, suggestionsDiv, textarea, lastWord);
+      });
+      
+      // Hide suggestions when textarea loses focus
+      textarea.addEventListener('blur', () => {
+        setTimeout(() => {
+          suggestionsDiv.style.display = 'none';
+        }, 200);
+      });
+      
+      // Show suggestions when textarea gains focus (if there's text)
+      textarea.addEventListener('focus', () => {
+        const query = textarea.value.toLowerCase();
+        if (query.length >= 2) {
+          const words = query.split(/[,\n]/);
+          const lastWord = words[words.length - 1].trim();
+          if (lastWord.length >= 2) {
+            const matches = ingredientMaster
+              .filter(ingredient => cleanIngredientName(ingredient.name).includes(lastWord))
+              .slice(0, 8);
+            renderIngredientSuggestions(matches, suggestionsDiv, textarea, lastWord);
+          }
+        }
+      });
+    }
+
+    function renderIngredientSuggestions(matches, suggestionsDiv, textarea, query) {
+      suggestionsDiv.innerHTML = '';
+      
+      if (matches.length === 0) {
+        suggestionsDiv.innerHTML = '<div class="ingredient-suggestion-item">No matches found</div>';
+        suggestionsDiv.style.display = 'block';
+        return;
+      }
+      
+      matches.forEach(match => {
+        const item = document.createElement('div');
+        item.className = 'ingredient-suggestion-item';
+        
+        // Highlight the matching part
+        const displayName = match.name;
+        const highlightedName = displayName.replace(
+          new RegExp(`(${query})`, 'gi'),
+          '<span class="suggestion-highlight">$1</span>'
+        );
+        
+        item.innerHTML = highlightedName;
+        
+        // Add note if available
+        if (match.note) {
+          const noteSpan = document.createElement('div');
+          noteSpan.style.fontSize = '0.8em';
+          noteSpan.style.color = 'var(--muted)';
+          noteSpan.textContent = match.note;
+          item.appendChild(noteSpan);
+        }
+        
+        item.addEventListener('click', () => {
+          // Replace the last word with the selected ingredient
+          const currentValue = textarea.value;
+          const words = currentValue.split(/[,\n]/);
+          words[words.length - 1] = match.name;
+          textarea.value = words.join(', ');
+          
+          // Hide suggestions
+          suggestionsDiv.style.display = 'none';
+          
+          // Focus back to textarea
+          textarea.focus();
+        });
+        
+        suggestionsDiv.appendChild(item);
+      });
+      
+      suggestionsDiv.style.display = 'block';
     }
 
     function setupFoodEntry(entry, defaultValue) {
       const select = entry.querySelector('.foodSelect');
       const textarea = entry.querySelector('.foodText');
+      const suggestionsDiv = entry.querySelector('.ingredient-suggestions');
       
       // Build options for this select
       const options = ["(none)", ...foodCatalog.map(f => `${f.brand} - ${f.name}`), "Custom (paste)"];
@@ -427,7 +577,60 @@
       
       select.addEventListener('change', updateTextarea);
       updateTextarea();
-    }
+       
+       // Set up ingredient suggestions for the textarea
+       setupTextareaSuggestions(textarea, entry);
+     }
+
+     function setupTextareaSuggestions(textarea, entry) {
+       const suggestionsDiv = entry.querySelector('.ingredient-suggestions');
+       
+       textarea.addEventListener('input', (e) => {
+         const query = e.target.value.toLowerCase();
+         if (query.length < 2) {
+           suggestionsDiv.style.display = 'none';
+           return;
+         }
+         
+         // Get the last word being typed (for comma-separated lists)
+         const words = query.split(/[,\n]/);
+         const lastWord = words[words.length - 1].trim();
+         
+         if (lastWord.length < 2) {
+           suggestionsDiv.style.display = 'none';
+           return;
+         }
+         
+         // Find matching ingredients from master list
+         const matches = ingredientMaster
+           .filter(ingredient => cleanIngredientName(ingredient.name).includes(lastWord))
+           .slice(0, 8); // Limit to 8 suggestions
+         
+         renderIngredientSuggestions(matches, suggestionsDiv, textarea, lastWord);
+       });
+       
+       // Hide suggestions when textarea loses focus
+       textarea.addEventListener('blur', () => {
+         setTimeout(() => {
+           suggestionsDiv.style.display = 'none';
+         }, 200);
+       });
+       
+       // Show suggestions when textarea gains focus (if there's text)
+       textarea.addEventListener('focus', () => {
+         const query = textarea.value.toLowerCase();
+         if (query.length >= 2) {
+           const words = query.split(/[,\n]/);
+           const lastWord = words[words.length - 1].trim();
+           if (lastWord.length >= 2) {
+             const matches = ingredientMaster
+               .filter(ingredient => cleanIngredientName(ingredient.name).includes(lastWord))
+               .slice(0, 8);
+             renderIngredientSuggestions(matches, suggestionsDiv, textarea, lastWord);
+           }
+         }
+       });
+     }
 
     function addNewFood(containerId) {
       const container = document.getElementById(containerId);
@@ -442,6 +645,7 @@
         </div>
         <small class="muted">Pick a sample or "Custom (paste)"</small>
         <textarea class="foodText" rows="3" placeholder="Paste ingredients separated by commas…"></textarea>
+        <div class="ingredient-suggestions" id="newFoodSuggestions"></div>
       `;
       
       container.appendChild(newEntry);
