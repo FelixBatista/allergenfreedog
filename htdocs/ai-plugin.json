@@ -1,0 +1,40 @@
+{
+  "schema_version": "v1",
+  "name_for_model": "AllergenFreeDog",
+  "name_for_human": "AllergenFreeDog - Dog Food Allergy Detection Tool",
+  "description_for_model": "AllergenFreeDog is a comprehensive web application that helps dog owners identify problematic ingredients by comparing triggering foods (foods that caused problems) with safe foods (foods that didn't cause issues). The tool provides ingredient analysis, allergen detection, and safe food testing capabilities.",
+  "description_for_human": "A free online tool to compare dog food ingredients and detect potential allergens. Compare triggering vs safe foods to identify problematic ingredients and test new foods for safety.",
+  "auth": {
+    "type": "none"
+  },
+  "api": {
+    "type": "openapi",
+    "url": "https://allergenfreedog.com/api/openapi.json",
+    "is_user_authenticated": false
+  },
+  "logo_url": "https://allergenfreedog.com/favicon.svg",
+  "contact_email": "support@allergenfreedog.com",
+  "legal_info_url": "https://allergenfreedog.com/terms",
+  "apis": [
+    {
+      "name": "food_catalog",
+      "description": "Manage and retrieve food catalog information including sample foods and custom entries",
+      "endpoint": "/api/food_catalog.php"
+    },
+    {
+      "name": "ingredients",
+      "description": "Handle ingredient operations, normalization, and retrieve master ingredient list",
+      "endpoint": "/api/ingredients.php"
+    },
+    {
+      "name": "compare",
+      "description": "Compare triggering and safe foods to identify non-similar ingredients",
+      "endpoint": "/api/compare.php"
+    },
+    {
+      "name": "safe_food_finder",
+      "description": "Test new foods against known problematic ingredients for safety assessment",
+      "endpoint": "/api/safe_food_finder.php"
+    }
+  ]
+}

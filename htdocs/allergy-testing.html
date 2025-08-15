@@ -1,0 +1,374 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Dog Food Allergy Testing Guide — allergenfreedog</title>
+  <meta name="description" content="Learn how to safely test for food allergies in dogs with our comprehensive elimination diet guide. Step-by-step instructions for identifying problematic ingredients." />
+  <style>
+    :root{
+      --bg:#fbf6ef;           /* soft beige */
+      --ink:#274642;          /* dark green-ink */
+      --muted:#5a7d75;        
+      --primary:#79C99E;      /* soft green */
+      --accent:#FF9F68;       /* warm orange */
+      --card:#ffffff;         /* cards */
+      --ok:#85d1a0;
+      --warn:#ffd27a;
+      --danger:#ffb0a3;
+      --ring: 0 0 0 3px rgb(121 201 158 / .35);
+      --shadow: 0 10px 24px rgba(0,0,0,.08);
+      --radius: 16px;
+    }
+    *{box-sizing:border-box}
+    html,body{margin:0;padding:0;background:var(--bg);color:var(--ink);font:16px/1.4 system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,"Helvetica Neue",Arial,sans-serif}
+    a{color:inherit}
+    .container{max-width:1100px;margin-inline:auto;padding:24px}
+    header{position:sticky;top:0;background:var(--bg)/.8;backdrop-filter:blur(8px);border-bottom:1px solid #e9e1d7;z-index:5}
+    .nav{display:flex;align-items:center;gap:16px;justify-content:space-between}
+    .brand{display:flex;align-items:center;gap:12px;font-weight:800;font-size:1.25rem;color:var(--ink)}
+    .brand svg{width:28px;height:28px}
+    .nav .actions{display:flex;gap:8px}
+    .btn{appearance:none;border:0;border-radius:999px;padding:10px 16px;font-weight:700;cursor:pointer;transition:.2s;display:inline-flex;gap:8px;align-items:center}
+    .btn.primary{background:var(--accent);color:#fff}
+    .btn.ghost{background:transparent;border:2px solid #c6dacd;color:var(--muted)}
+    .btn.primary:hover{transform:translateY(-1px);filter:saturate(1.1)}
+    .btn.ghost:hover{border-color:var(--primary);color:var(--ink)}
+
+    .hero{padding:40px 0}
+    .hero h1{font-size:clamp(1.6rem,1.2rem + 2vw,2.4rem);margin:0 0 8px;font-weight:900}
+    .tag{color:var(--accent);font-weight:800}
+    .lede{color:var(--muted);max-width:60ch}
+
+    .grid{display:grid;grid-template-columns:1.2fr .8fr;gap:24px}
+    @media (max-width:900px){.grid{grid-template-columns:1fr}}
+
+    .card{background:var(--card);border-radius:var(--radius);box-shadow:var(--shadow);padding:18px}
+    .card h2{margin:0 0 12px;font-size:1.2rem}
+    .card h3{margin:0 0 8px;font-size:1.1rem;color:var(--ink)}
+
+    .field{display:grid;gap:8px;margin:10px 0}
+    label{font-weight:700}
+
+    .row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+    @media (max-width:680px){.row{grid-template-columns:1fr}}
+
+    .pill{display:inline-flex;align-items:center;gap:6px;border-radius:999px;padding:4px 10px;font-size:.8rem;font-weight:700}
+    .pill.ok{background:var(--ok)}
+    .pill.warn{background:var(--warn)}
+    .pill.danger{background:var(--danger)}
+    .pill.info{background:var(--primary);color:white}
+
+    .timeline{position:relative;padding-left:24px}
+    .timeline::before{content:'';position:absolute;left:8px;top:0;bottom:0;width:2px;background:var(--primary)}
+    .timeline-item{position:relative;margin-bottom:24px}
+    .timeline-item::before{content:'';position:absolute;left:-16px;top:8px;width:12px;height:12px;background:var(--primary);border-radius:50%}
+    .timeline-item h4{margin:0 0 8px;color:var(--accent)}
+    .timeline-item p{margin:0 0 8px;line-height:1.6}
+
+    .warning-box{background:#fff3e0;border:2px solid #ffb74d;border-radius:12px;padding:16px;margin:16px 0}
+    .warning-box h4{color:#e65100;margin:0 0 8px}
+    .warning-box p{margin:0;color:#bf360c}
+
+    .success-box{background:#e8f5e8;border:2px solid #66bb6a;border-radius:12px;padding:16px;margin:16px 0}
+    .success-box h4{color:#2e7d32;margin:0 0 8px}
+    .success-box p{margin:0;color:#1b5e20}
+
+    .checklist{list-style:none;padding:0}
+    .checklist li{position:relative;padding-left:32px;margin-bottom:12px;line-height:1.6}
+    .checklist li::before{content:'✓';position:absolute;left:0;top:0;width:20px;height:20px;background:var(--ok);color:white;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:bold}
+
+    .taglink{color:var(--muted);text-decoration:underline dotted}
+
+    footer{margin-top:40px;border-top:1px solid #e9e1d7}
+    footer .inner{display:flex;flex-wrap:wrap;gap:12px;justify-content:space-between;align-items:center;padding:18px 0;color:var(--muted)}
+  </style>
+  
+  <!-- Favicon and meta tags -->
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+  <link rel="alternate icon" href="/favicon.ico">
+  <meta name="theme-color" content="#79C99E">
+</head>
+<body>
+  <header>
+    <div class="container nav">
+      <div class="brand" aria-label="allergenfreedog brand">
+        <svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M20 20c0-4 3-7 7-7s7 3 7 7-3 7-7 7-7-3-7-7Z" fill="#79C99E"/><circle cx="48" cy="20" r="6" fill="#79C99E"/><circle cx="17" cy="36" r="5" fill="#79C99E"/><circle cx="35" cy="43" r="5" fill="#79C99E"/><path d="M20 53c6 5 18 5 24 0 5-4 6-11 2-16-6-7-22-7-28 0-4 5-3 12 2 16Z" fill="#FF9F68"/></svg>
+        allergenfreedog
+      </div>
+      <div class="actions">
+        <a class="btn ghost" href="index.html">Food Comparison Tool</a>
+        <a class="btn primary" href="index.html#compare">Compare Now</a>
+      </div>
+    </div>
+  </header>
+
+  <main class="container hero">
+    <div class="grid">
+      <section class="card">
+        <h1><span class="tag">Food Allergy Testing</span> in Dogs: A Complete Guide 🐕</h1>
+        <p class="lede">Learn how to safely identify food allergies in your dog using the elimination diet method. This systematic approach helps pinpoint exactly which ingredients cause problems.</p>
+        
+        <div class="warning-box">
+          <h4>⚠️ Important Safety Notice</h4>
+          <p><strong>Always consult with your veterinarian</strong> before starting any elimination diet. This guide is for informational purposes only and should not replace professional veterinary advice.</p>
+        </div>
+      </section>
+
+      <aside class="card">
+        <h2>Quick Overview</h2>
+        <ul class="checklist">
+          <li>Eliminate all current foods for 2-8 weeks</li>
+          <li>Introduce one new food at a time</li>
+          <li>Monitor for symptoms carefully</li>
+          <li>Keep detailed records</li>
+          <li>Work with your veterinarian</li>
+        </ul>
+        <p style="margin-top:16px;font-size:0.9rem;color:var(--muted)">This process requires patience and commitment but is the most reliable way to identify food allergies.</p>
+      </aside>
+    </div>
+
+    <section class="card" style="margin-top:24px">
+      <h2>What Are Food Allergies in Dogs?</h2>
+      <p>Food allergies occur when a dog's immune system overreacts to specific proteins in their diet. Common symptoms include:</p>
+      
+      <div class="row">
+        <div>
+          <h4>Skin Issues</h4>
+          <ul>
+            <li>Itching and scratching</li>
+            <li>Red, inflamed skin</li>
+            <li>Hair loss</li>
+            <li>Ear infections</li>
+          </ul>
+        </div>
+        <div>
+          <h4>Digestive Problems</h4>
+          <ul>
+            <li>Vomiting</li>
+            <li>Diarrhea</li>
+            <li>Gas and bloating</li>
+            <li>Loss of appetite</li>
+          </ul>
+        </div>
+      </div>
+      
+      <p><strong>Note:</strong> These symptoms can also indicate other health issues, so proper veterinary diagnosis is essential.</p>
+    </section>
+
+    <section class="card" style="margin-top:24px">
+      <h2>The Elimination Diet Process</h2>
+      <p>The elimination diet is the gold standard for identifying food allergies. It involves completely removing all current foods and gradually reintroducing them one by one.</p>
+      
+      <div class="timeline">
+        <div class="timeline-item">
+          <h4>Phase 1: Preparation (Week 1)</h4>
+          <p>Consult your veterinarian and prepare for the elimination diet. Gather necessary supplies and create a monitoring system.</p>
+        </div>
+        
+        <div class="timeline-item">
+          <h4>Phase 2: Elimination (Weeks 2-8)</h4>
+          <p>Remove ALL current foods, treats, and supplements. Feed only the prescribed elimination diet.</p>
+        </div>
+        
+        <div class="timeline-item">
+          <h4>Phase 3: Reintroduction (Weeks 9+)</h4>
+          <p>Gradually add back one food at a time, monitoring for any return of symptoms.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="card" style="margin-top:24px">
+      <h2>Step-by-Step Instructions</h2>
+      
+      <h3>Step 1: Veterinary Consultation</h3>
+      <p>Before starting any elimination diet, you must:</p>
+      <ul>
+        <li>Schedule a comprehensive veterinary exam</li>
+        <li>Rule out other health conditions</li>
+        <li>Get a prescription for an appropriate elimination diet</li>
+        <li>Establish a monitoring plan</li>
+      </ul>
+
+      <h3>Step 2: Choose Your Elimination Diet</h3>
+      <p>Your veterinarian will recommend one of these options:</p>
+      <div class="row">
+        <div>
+          <h4>Hydrolyzed Protein Diet</h4>
+          <p>Proteins are broken down into tiny pieces that don't trigger allergic reactions. Often the safest choice for severe allergies.</p>
+        </div>
+        <div>
+          <h4>Novel Protein Diet</h4>
+          <p>Uses protein sources your dog has never eaten before (e.g., venison, rabbit, duck). Less likely to cause reactions.</p>
+        </div>
+      </div>
+
+      <h3>Step 3: Complete Elimination</h3>
+      <div class="warning-box">
+        <h4>🚫 What to Eliminate</h4>
+        <p><strong>Everything must go:</strong> Current kibble, wet food, treats, table scraps, flavored medications, and even flavored toothpaste. Only the prescribed elimination diet is allowed.</p>
+      </div>
+      
+      <p><strong>Duration:</strong> Most dogs need 6-8 weeks for symptoms to fully resolve. Some may improve in 2-4 weeks, but longer is better for accurate results.</p>
+
+      <h3>Step 4: Monitor and Record</h3>
+      <p>Keep detailed records of your dog's condition:</p>
+      <ul>
+        <li>Daily symptom scores (itching, scratching, skin condition)</li>
+        <li>Photos of any skin issues</li>
+        <li>Digestive symptoms</li>
+        <li>Energy levels and behavior changes</li>
+        <li>Any medications given</li>
+      </ul>
+
+      <h3>Step 5: Gradual Reintroduction</h3>
+      <p>Once symptoms have completely resolved for at least 2 weeks:</p>
+      
+      <div class="timeline">
+        <div class="timeline-item">
+          <h4>Week 1: First Food</h4>
+          <p>Add a small amount of one food (about 10% of daily intake) and monitor for 7 days.</p>
+        </div>
+        
+        <div class="timeline-item">
+          <h4>Week 2: Increase Amount</h4>
+          <p>If no symptoms, increase to 25% of daily intake and continue monitoring.</p>
+        </div>
+        
+        <div class="timeline-item">
+          <h4>Week 3: Full Amount</h4>
+          <p>If still no symptoms, increase to 50% of daily intake.</p>
+        </div>
+        
+        <div class="timeline-item">
+          <h4>Week 4: Confirm</h4>
+          <p>If no symptoms after 4 weeks, this food is likely safe. Return to elimination diet and test the next food.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="card" style="margin-top:24px">
+      <h2>What to Look For</h2>
+      <p>During reintroduction, watch for these signs that indicate an allergic reaction:</p>
+      
+      <div class="row">
+        <div>
+          <h4>Immediate Reactions (within hours)</h4>
+          <ul>
+            <li>Vomiting or diarrhea</li>
+            <li>Excessive scratching</li>
+            <li>Facial swelling</li>
+            <li>Difficulty breathing</li>
+          </ul>
+        </div>
+        <div>
+          <h4>Delayed Reactions (days later)</h4>
+          <ul>
+            <li>Skin redness or inflammation</li>
+            <li>Ear infections</li>
+            <li>Hair loss</li>
+            <li>Behavioral changes</li>
+          </ul>
+        </div>
+      </div>
+      
+      <div class="warning-box">
+        <h4>🚨 Emergency Signs</h4>
+        <p>If your dog shows difficulty breathing, severe swelling, or collapse, <strong>seek immediate veterinary care</strong>. These are signs of a severe allergic reaction.</p>
+      </div>
+    </section>
+
+    <section class="card" style="margin-top:24px">
+      <h2>Common Mistakes to Avoid</h2>
+      
+      <div class="row">
+        <div>
+          <h4>❌ What Not to Do</h4>
+          <ul>
+            <li>Skip veterinary consultation</li>
+            <li>Use homemade elimination diets</li>
+            <li>Give treats or table scraps</li>
+            <li>Rush the process</li>
+            <li>Test multiple foods at once</li>
+            <li>Ignore subtle symptoms</li>
+          </ul>
+        </div>
+        <div>
+          <h4>✅ What to Do Instead</h4>
+          <ul>
+            <li>Work with your veterinarian</li>
+            <li>Use prescribed commercial diets</li>
+            <li>Stick strictly to the plan</li>
+            <li>Be patient and thorough</li>
+            <li>Test one food at a time</li>
+            <li>Document everything</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <section class="card" style="margin-top:24px">
+      <h2>Using Our Comparison Tool</h2>
+      <p>Once you've identified problematic foods, use our <a href="index.html#compare" class="taglink">Food Comparison Tool</a> to:</p>
+      
+      <ul>
+        <li>Compare ingredients between problematic and safe foods</li>
+        <li>Identify which specific ingredients cause issues</li>
+        <li>Test new foods before feeding them to your dog</li>
+        <li>Build a database of safe and unsafe ingredients</li>
+      </ul>
+      
+      <div class="success-box">
+        <h4>💡 Pro Tip</h4>
+        <p>Use the comparison tool to analyze the ingredients of foods that caused reactions. This helps identify patterns and avoid similar ingredients in the future.</p>
+      </div>
+    </section>
+
+    <section class="card" style="margin-top:24px">
+      <h2>When to Seek Veterinary Help</h2>
+      <p>Contact your veterinarian immediately if:</p>
+      
+      <ul>
+        <li>Symptoms worsen during the elimination diet</li>
+        <li>Your dog refuses to eat the elimination diet</li>
+        <li>New symptoms develop</li>
+        <li>You're unsure about any part of the process</li>
+        <li>Your dog shows signs of severe allergic reaction</li>
+      </ul>
+      
+      <p><strong>Remember:</strong> Your veterinarian is your partner in this process. Regular check-ins ensure your dog stays healthy throughout the elimination diet.</p>
+    </section>
+
+    <section class="card" style="margin-top:24px">
+      <h2>Success Stories and Tips</h2>
+      
+      <div class="success-box">
+        <h4>🎯 Success Factors</h4>
+        <p><strong>Patience:</strong> This process takes time, but the results are worth it. Many dogs show improvement within 2-4 weeks of starting the elimination diet.</p>
+      </div>
+      
+      <p><strong>Common Success Patterns:</strong></p>
+      <ul>
+        <li>Skin issues often improve first (within 1-2 weeks)</li>
+        <li>Digestive symptoms may take longer to resolve</li>
+        <li>Some dogs need longer elimination periods (8-12 weeks)</li>
+        <li>Multiple food sensitivities are common</li>
+      </ul>
+      
+      <p><strong>Long-term Management:</strong> Once you've identified problematic foods, you can create a rotation of safe foods to provide variety while avoiding allergens.</p>
+    </section>
+  </main>
+
+  <footer>
+    <div class="container inner">
+      <small>© <span id="yr"></span> allergenfreedog • For information only — not veterinary advice.</small>
+      <a href="index.html" class="taglink">Back to Food Comparison Tool</a>
+    </div>
+  </footer>
+
+  <script>
+    // year
+    document.getElementById('yr').textContent = new Date().getFullYear();
+  </script>
+</body>
+</html>

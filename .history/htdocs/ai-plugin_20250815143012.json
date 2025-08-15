@@ -1,0 +1,12 @@
+{
+  "schema_version": "v1",
+  "name_for_human": "AllergenFreeDog",
+  "name_for_model": "allergen_free_dog",
+  "description_for_human": "Compare dog food ingredients to detect possible allergens in your dog's diet.",
+  "description_for_model": "A tool to compare triggering vs safe dog foods and highlight potential allergens such as gluten, poultry, soy, peas, and fish.",
+  "auth": { "type": "none" },
+  "api": { "type": "none" },
+  "logo_url": "https://allergenfreedog.com/favicon.svg",
+  "contact_email": "you@example.com",
+  "legal_info_url": "https://allergenfreedog.com/privacy"
+}

@@ -1,0 +1,16 @@
+User-agent: *
+Allow: /
+Allow: /index.html
+Allow: /allergy-testing.html
+Allow: /favicon.svg
+Allow: /favicon.ico
+
+# Disallow sensitive files and directories
+Disallow: /config/
+Disallow: /database/
+Disallow: /api/
+Disallow: /.htaccess
+Disallow: /README.md
+
+# Sitemap location
+Sitemap: https://allergenfreedog.com/sitemap.xml
