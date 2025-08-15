@@ -491,18 +491,40 @@
     }
 
     function parseList(text){
-      return text.split(/,|;|\n/).map(x=>x.trim().toLowerCase()).filter(Boolean);
+      return text
+        .split(/,|;|\n/)
+        .map(x => x
+          .trim()
+          .replace(/\s+/g, ' ')           // Replace multiple spaces with single space
+          .replace(/[\u200B-\u200D\uFEFF]/g, '') // Remove zero-width spaces and BOM
+          .replace(/[\u00A0\u1680\u180e\u2000-\u200a\u202f\u205f\u3000]/g, ' ') // Replace various space characters with regular space
+          .trim()
+        )
+        .filter(x => x.length > 0)        // Remove empty strings
+        .map(x => x.toLowerCase());        // Convert to lowercase for consistency
+    }
+
+    // Utility function to clean ingredient names consistently
+    function cleanIngredientName(name) {
+      return name
+        .trim()
+        .replace(/\s+/g, ' ')           // Replace multiple spaces with single space
+        .replace(/[\u200B-\u200D\uFEFF]/g, '') // Remove zero-width spaces and BOM
+        .replace(/[\u00A0\u1680\u180e\u2000-\u200a\u202f\u205f\u3000]/g, ' ') // Replace various space characters with regular space
+        .trim()
+        .toLowerCase();
     }
 
     function allergenClass(name, prefs){
-      const lowHydro = prefs.hydro && /hydroly(s|z)ed|hydroly(s|z)sed/.test(name.toLowerCase());
-      const ingredient = ingredientMaster.find(im => im.name.toLowerCase() === name.toLowerCase());
+      const cleanName = cleanIngredientName(name);
+      const lowHydro = prefs.hydro && /hydroly(s|z)ed|hydroly(s|z)sed/.test(cleanName);
+      const ingredient = ingredientMaster.find(im => cleanIngredientName(im.name) === cleanName);
       
       if (!ingredient) return 'ok';
       
       const tags = ingredient.tags || [];
       if(prefs.noGluten && tags.includes('gluten')) return 'danger';
-      if(prefs.noPoultry && (name.toLowerCase().includes('poultry') || name.toLowerCase().includes('chicken'))) return 'danger';
+      if(prefs.noPoultry && (cleanName.includes('poultry') || cleanName.includes('chicken'))) return 'danger';
       if(lowHydro) return 'ok';
       if(ingredient.risk_level === 'danger') return 'danger';
       if(ingredient.risk_level === 'warn') return 'warn';
@@ -510,7 +532,8 @@
     }
 
     function noteFor(name){
-      const ingredient = ingredientMaster.find(im => im.name.toLowerCase() === name.toLowerCase());
+      const cleanName = cleanIngredientName(name);
+      const ingredient = ingredientMaster.find(im => cleanIngredientName(im.name) === cleanName);
       return ingredient ? ingredient.note : '';
     }
 
@@ -761,7 +784,8 @@
     const gloss = document.getElementById('glossary');
     function renderGlossary(filter=''){
       gloss.innerHTML = '';
-      ingredientMaster.filter(m=>m.name.toLowerCase().includes(filter.toLowerCase())).forEach(m=>{
+      const cleanFilter = cleanIngredientName(filter);
+      ingredientMaster.filter(m => cleanIngredientName(m.name).includes(cleanFilter)).forEach(m=>{
         const card = document.createElement('div');
         card.className='gloss';
         const tag = m.tags.includes('gluten')? 'danger' : m.tags.includes('danger')? 'danger' : m.tags.includes('possible')? 'warn':'ok';
