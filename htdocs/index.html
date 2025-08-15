@@ -207,12 +207,25 @@
   </div>
 
   <script>
-    // --- Sample catalog (can be replaced with real DB later) ---
-    const CATALOG = {
-      "Insect & Pea": "dehydrated insect, yellow peas, dried apple pulp, coconut oil, pea protein, linseed, calcium carbonate, dried algae (schizochytrium), pea flour, hydrolyzed yeasts, yeast extract, beta-glucans, dried sea buckthorn, fructo-oligosaccharides, mojave yucca, lactobacillus helveticus, minerals",
-      "Poultry Senior Large Breed": "dehydrated poultry proteins, animal fats, maize, wheat meal, wheat flour, barley, maize gluten, wheat gluten, hydrolysed animal proteins, beet pulp, minerals, fish oil, soya oil, yeast products, psyllium husks and seeds, fructo-oligosaccharides, algal oil (schizochytrium), glucosamine, hydrolysed cartilage",
-      "Salmon & Pea": "dehydrated salmon, yellow peas, hydrolysed salmon protein, buckwheat, coconut oil, apple pulp, salmon oil, hydrolysed salmon gravy, minerals, dried algae (ascophyllum), yeast extract, beta-glucans, dried sea buckthorn, fructo-oligosaccharides, mojave yucca"
-    };
+    // --- Catalog (loaded from backend, falls back to sample) ---
+    let CATALOG = {};
+    async function loadCatalog(){
+      try{
+        const res = await fetch('api/foods.php');
+        const data = await res.json();
+        data.forEach(f=>{ CATALOG[f.name] = f.ingredients; });
+      }catch(err){
+        console.error('Using sample catalog', err);
+        CATALOG = {
+          "Insect & Pea": "dehydrated insect, yellow peas, dried apple pulp, coconut oil, pea protein, linseed, calcium carbonate, dried algae (schizochytrium), pea flour, hydrolyzed yeasts, yeast extract, beta-glucans, dried sea buckthorn, fructo-oligosaccharides, mojave yucca, lactobacillus helveticus, minerals",
+          "Poultry Senior Large Breed": "dehydrated poultry proteins, animal fats, maize, wheat meal, wheat flour, barley, maize gluten, wheat gluten, hydrolysed animal proteins, beet pulp, minerals, fish oil, soya oil, yeast products, psyllium husks and seeds, fructo-oligosaccharides, algal oil (schizochytrium), glucosamine, hydrolysed cartilage",
+          "Salmon & Pea": "dehydrated salmon, yellow peas, hydrolysed salmon protein, buckwheat, coconut oil, apple pulp, salmon oil, hydrolysed salmon gravy, minerals, dried algae (ascophyllum), yeast extract, beta-glucans, dried sea buckthorn, fructo-oligosaccharides, mojave yucca"
+        };
+      }
+      ['p1','p2','p3','p4'].forEach(buildOptions);
+      ['p1','p2','p3','p4'].forEach(syncTextarea);
+    }
+    loadCatalog();
 
     // --- Normalisation & tags ---
     const MASTER = [
@@ -284,8 +297,6 @@
       el.value = sel==='p1' ? "Insect & Pea" : "(none)";
     }
 
-    ['p1','p2','p3','p4'].forEach(buildOptions);
-
     function syncTextarea(id){
       const sel = document.getElementById(id);
       const ta = document.getElementById(id+'txt');
@@ -297,8 +308,6 @@
       }
       sel.addEventListener('change', update); update();
     }
-    ['p1','p2','p3','p4'].forEach(syncTextarea);
-
     // Filters
     let currentFilter = 'showAll';
     document.querySelectorAll('.chip[data-filter]').forEach(ch=>{

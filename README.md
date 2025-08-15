@@ -1,18 +1,21 @@
 # AllergenFreeDog
 
-A simple maintainable website for comparing dog foods. This implementation uses a small Python web server and an SQLite database to store dog food entries. The front end communicates with the server via JSON endpoints.
+This repository contains a small PHP-based website for comparing dog foods.  All site files live in the `htdocs/` folder so it can be uploaded directly to InfinityFree hosting.
 
-## Getting Started
+## Structure
+- `htdocs/index.html` – main client-side comparison tool (looks unchanged from the original mockup).
+- `htdocs/api/foods.php` – JSON API for listing and adding dog foods.
+- `htdocs/lib/db.php` – PDO wrapper for SQLite/MySQL.
+- `tests/` – simple CLI test using an in-memory SQLite database.
 
-1. **Run the server**
+## Development
+1. **Lint PHP files**
    ```bash
-   python app.py
+   php -l htdocs/lib/db.php htdocs/api/foods.php tests/test_db.php
    ```
-   The site will be available at `http://localhost:8000`.
-
 2. **Run tests**
    ```bash
-   python -m unittest
+   php tests/test_db.php
    ```
 
-The application stores data in `allergenfreedog.db` by default. Set the `DB_PATH` environment variable to change the database location.
+The API defaults to a SQLite database at `htdocs/data/foods.db`. To use MySQL on InfinityFree, set environment variables `DB_DSN`, `DB_USER`, and `DB_PASS` with your MySQL credentials.
