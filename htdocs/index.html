@@ -565,13 +565,25 @@
         // Show the safe food finder
         document.getElementById('safeFoodFinder').style.display = 'block';
         
+        // Show success state for 10 seconds
+        submitBtn.textContent = 'Done!';
+        submitBtn.style.background = 'var(--ok)';
+        submitBtn.disabled = false;
+        
+        // After 10 seconds, restore original button state
+        setTimeout(() => {
+          submitBtn.textContent = originalText;
+          submitBtn.style.background = '';
+        }, 10000);
+        
       } catch (error) {
         console.error('Comparison failed:', error);
         alert('Comparison failed: ' + error.message);
-      } finally {
-        // Restore button state
+        
+        // Restore button state on error
         const submitBtn = document.querySelector('#compare button[type="submit"]');
-        submitBtn.textContent = originalText;
+        submitBtn.textContent = 'Build Comparison';
+        submitBtn.style.background = '';
         submitBtn.disabled = false;
       }
     });
