@@ -78,8 +78,8 @@
    .form .grid.two-col-form .field{align-self:start}
 
    /* Add buttons in the food columns should have a fixed height and consistent width */
-  .add-food-btn{height:40px;min-height:40px;display:inline-flex;align-items:center;justify-content:center;padding:0 12px;width:100%;max-width:360px}
-  .add-food-btn.btn{padding:0 12px}    
+   .add-food-btn{height:40px;min-height:40px;display:inline-flex;align-items:center;justify-content:center;padding:0 12px}
+   .add-food-btn.btn{padding:0 12px}    
     @media (max-width:900px){.grid{grid-template-columns:1fr}}
 
     .card{background:var(--card);border-radius:var(--radius);box-shadow:var(--shadow);padding:18px}
@@ -234,7 +234,7 @@
             <button type="button" class="chip" data-filter="overlap">Overlaps only</button>
           </div>
 
-          <div class="grid two-col-form">
+          <div class="grid">
             <div class="field">
               <label>Triggering Foods (Foods that caused problems)</label>
               <div id="triggeringFoods">
@@ -245,7 +245,7 @@
                   <div class="ingredient-suggestions" id="triggeringSuggestions"></div>
                 </div>
               </div>
-              <button type="button" class="btn ghost add-food-btn" id="addTriggeringFood">+ Add Another Triggering Food</button>
+              <button type="button" class="btn ghost" id="addTriggeringFood">+ Add Another Triggering Food</button>
             </div>
             
             <div class="field">
@@ -258,7 +258,7 @@
                   <div class="ingredient-suggestions" id="safeSuggestions"></div>
             </div>
           </div>
-              <button type="button" class="btn ghost add-food-btn" id="addSafeFood">+ Add Another Safe Food</button>
+              <button type="button" class="btn ghost" id="addSafeFood">+ Add Another Safe Food</button>
             </div>
           </div>
 

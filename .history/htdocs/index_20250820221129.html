@@ -72,14 +72,12 @@
     .lede{color:var(--muted);max-width:60ch}
 
    .grid{display:grid;grid-template-columns:1.2fr .8fr;gap:24px}
-   /* Form inner grid: keep columns independent and equal width so one column's height
-     doesn't stretch the other. Use align-items:start to prevent vertical stretching. */
-   .form .grid.two-col-form{grid-template-columns:1fr 1fr;align-items:start}
-   .form .grid.two-col-form .field{align-self:start}
-
-   /* Add buttons in the food columns should have a fixed height and consistent width */
-  .add-food-btn{height:40px;min-height:40px;display:inline-flex;align-items:center;justify-content:center;padding:0 12px;width:100%;max-width:360px}
-  .add-food-btn.btn{padding:0 12px}    
+   /* Make the two food-entry columns independent so one growing doesn't stretch the other.
+     Keep the add-buttons a fixed height and let the food lists scroll when they get long. */
+   .grid.two-columns .field{display:flex;flex-direction:column;gap:8px}
+   .grid.two-columns #triggeringFoods,
+   .grid.two-columns #safeFoods{flex:1 1 auto;overflow:auto;min-height:4rem;max-height:260px;padding-right:4px}
+   .grid.two-columns .addBtn{height:40px;min-height:40px;padding:8px 12px;align-self:flex-start}
     @media (max-width:900px){.grid{grid-template-columns:1fr}}
 
     .card{background:var(--card);border-radius:var(--radius);box-shadow:var(--shadow);padding:18px}
@@ -234,7 +232,7 @@
             <button type="button" class="chip" data-filter="overlap">Overlaps only</button>
           </div>
 
-          <div class="grid two-col-form">
+          <div class="grid two-columns">
             <div class="field">
               <label>Triggering Foods (Foods that caused problems)</label>
               <div id="triggeringFoods">
@@ -245,7 +243,7 @@
                   <div class="ingredient-suggestions" id="triggeringSuggestions"></div>
                 </div>
               </div>
-              <button type="button" class="btn ghost add-food-btn" id="addTriggeringFood">+ Add Another Triggering Food</button>
+              <button type="button" class="btn ghost addBtn" id="addTriggeringFood">+ Add Another Triggering Food</button>
             </div>
             
             <div class="field">
@@ -258,7 +256,7 @@
                   <div class="ingredient-suggestions" id="safeSuggestions"></div>
             </div>
           </div>
-              <button type="button" class="btn ghost add-food-btn" id="addSafeFood">+ Add Another Safe Food</button>
+              <button type="button" class="btn ghost addBtn" id="addSafeFood">+ Add Another Safe Food</button>
             </div>
           </div>
 
@@ -653,7 +651,7 @@
         </div>
         <small class="muted">Pick a sample or "Custom (paste)"</small>
         <textarea class="foodText" rows="3" placeholder="Paste ingredients separated by commas…"></textarea>
-        <div class="ingredient-suggestions" id="newFoodSuggestions"></div>
+  <div class="ingredient-suggestions"></div>
       `;
       
       container.appendChild(newEntry);
