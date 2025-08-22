@@ -239,15 +239,11 @@
             <button type="button" class="chip" data-filter="overlap">Overlaps only</button>
           </div>
 
-          <!-- per-column brand filters moved into each column for scoped filtering -->
+          <!-- per-entry brand filter will be shown inline for each food entry -->
 
           <div class="grid two-col-form">
             <div class="field">
               <label>Triggering Foods (Foods that caused problems)</label>
-                <div style="display:flex;gap:8px;align-items:center">
-                  <small class="muted">Filter by brand:</small>
-                  <select class="brandFilter"><option value="">All brands</option></select>
-                </div>
               <div id="triggeringFoods">
                 <div class="foodEntry">
                   <select class="foodSelect" aria-describedby="triggeringHelp"></select>
@@ -261,10 +257,6 @@
             
             <div class="field">
               <label>Safe Foods (Foods that didn't cause problems)</label>
-                <div style="display:flex;gap:8px;align-items:center">
-                  <small class="muted">Filter by brand:</small>
-                  <select class="brandFilter"><option value="">All brands</option></select>
-                </div>
               <div id="safeFoods">
                 <div class="foodEntry">
                   <select class="foodSelect" aria-describedby="safeHelp"></select>
@@ -411,6 +403,8 @@
     }
 
     function populateBrandFilter(){
+      const sel = document.getElementById('brandFilter');
+      if(!sel) return;
       // Build a map of lowercase -> original casing (first occurrence)
       const brandMap = {};
       foodCatalog.forEach(f => {
@@ -420,29 +414,25 @@
         if(!(key in brandMap)) brandMap[key] = raw; // keep first/original casing
       });
       const keys = Object.keys(brandMap).sort();
-      // populate every per-column brandFilter
-      document.querySelectorAll('.brandFilter').forEach(sel=>{
-        sel.innerHTML = '<option value="">All brands</option>' + keys.map(k=>`<option value="${k}">${brandMap[k]}</option>`).join('');
-        // ensure single listener: replace node
-        const newSel = sel.cloneNode(true);
-        sel.parentNode.replaceChild(newSel, sel);
-        newSel.addEventListener('change', ()=>{
-          // refresh only the selects inside the same column (closest .field parent)
-          const field = newSel.closest('.field');
-          if(!field) return;
+      sel.innerHTML = '<option value="">All brands</option>' + keys.map(k=>`<option value="${k}">${brandMap[k]}</option>`).join('');
+      // remove any existing change listeners by cloning the node
+      const newSel = sel.cloneNode(true);
+      sel.parentNode.replaceChild(newSel, sel);
+      newSel.addEventListener('change', ()=>{
+        // refresh every food select options
+        document.querySelectorAll('.foodEntry').forEach(fe=>{
+          const selEl = fe.querySelector('.foodSelect');
+          // rebuild options preserving selection where possible
+          const prev = selEl.value;
+          selEl.innerHTML='';
+          const noneOp = document.createElement('option'); noneOp.value='(none)'; noneOp.textContent='(none)'; selEl.append(noneOp);
           const brandFilter = (newSel.value||'').trim().toLowerCase();
-          field.querySelectorAll('.foodEntry').forEach(fe=>{
-            const selEl = fe.querySelector('.foodSelect');
-            const prev = selEl.value;
-            selEl.innerHTML='';
-            const noneOp = document.createElement('option'); noneOp.value='(none)'; noneOp.textContent='(none)'; selEl.append(noneOp);
-            foodCatalog.filter(f => !brandFilter || ((f.brand||'').trim().toLowerCase() === brandFilter)).forEach(f => {
-              const text = `${f.brand}${f.brand? ' - ':' '}${f.name}`.trim();
-              const op = document.createElement('option'); op.value = text; op.textContent = text; selEl.append(op);
-            });
-            const customOp = document.createElement('option'); customOp.value='Custom (paste)'; customOp.textContent='Custom (paste)'; selEl.append(customOp);
-            try{ selEl.value = prev; }catch(e){}
+          foodCatalog.filter(f => !brandFilter || ((f.brand||'').trim().toLowerCase() === brandFilter)).forEach(f => {
+            const text = `${f.brand}${f.brand? ' - ':' '}${f.name}`.trim();
+            const op = document.createElement('option'); op.value = text; op.textContent = text; selEl.append(op);
           });
+          const customOp = document.createElement('option'); customOp.value='Custom (paste)'; customOp.textContent='Custom (paste)'; selEl.append(customOp);
+          try{ selEl.value = prev; }catch(e){}
         });
       });
     }
@@ -602,23 +592,41 @@
       const textarea = entry.querySelector('.foodText');
       const suggestionsDiv = entry.querySelector('.ingredient-suggestions');
       
-      // Build options for this select respecting brand filter
-      // look for a local per-column brandFilter select inside the closest .field
-      let brandFilter = '';
-      const colField = entry.closest('.field');
-      if(colField){
-        const bf = colField.querySelector('.brandFilter');
-        if(bf) brandFilter = (bf.value||'').trim().toLowerCase();
+      // Create a compact per-entry brand filter (small select to the left of the food select)
+      let brandSelect = entry.querySelector('.brandSelect');
+      if(!brandSelect){
+        brandSelect = document.createElement('select');
+        brandSelect.className = 'brandSelect';
+        brandSelect.style.width = '140px';
+        brandSelect.style.marginRight = '8px';
+        // insert before the main select
+        select.parentNode.insertBefore(brandSelect, select);
       }
-  const noneOp = document.createElement('option'); noneOp.value='(none)'; noneOp.textContent='(none)'; select.append(noneOp);
-  foodCatalog.filter(f => !brandFilter || ((f.brand||'').trim().toLowerCase() === brandFilter)).forEach(f => {
-        const op = document.createElement('option');
-        const text = `${f.brand}${f.brand? ' - ':' '}${f.name}`.trim();
-        op.value = text;
-        op.textContent = text;
-        select.append(op);
-      });
-      const customOp = document.createElement('option'); customOp.value='Custom (paste)'; customOp.textContent='Custom (paste)'; select.append(customOp);
+
+      // populate brandSelect with available brands (original casing)
+      (function populateEntryBrands(){
+        const map = {};
+        foodCatalog.forEach(f=>{ const b=(f.brand||'').trim(); if(b) map[b.toLowerCase()]=map[b.toLowerCase()]||b; });
+        const keys = Object.keys(map).sort();
+        brandSelect.innerHTML = '<option value="">All</option>' + keys.map(k=>`<option value="${k}">${map[k]}</option>`).join('');
+      })();
+
+      function rebuildOptionsForEntry(){
+        const brandFilter = (brandSelect.value||'').trim().toLowerCase();
+        const prev = select.value;
+        select.innerHTML = '';
+        const noneOp = document.createElement('option'); noneOp.value='(none)'; noneOp.textContent='(none)'; select.append(noneOp);
+        foodCatalog.filter(f => !brandFilter || ((f.brand||'').trim().toLowerCase() === brandFilter)).forEach(f => {
+          const op = document.createElement('option');
+          const text = `${f.brand}${f.brand? ' - ':' '}${f.name}`.trim();
+          op.value = text; op.textContent = text; select.append(op);
+        });
+        const customOp = document.createElement('option'); customOp.value='Custom (paste)'; customOp.textContent='Custom (paste)'; select.append(customOp);
+        try{ select.value = prev; }catch(e){}
+      }
+
+      brandSelect.addEventListener('change', rebuildOptionsForEntry);
+      rebuildOptionsForEntry();
       
       select.value = defaultValue;
       
