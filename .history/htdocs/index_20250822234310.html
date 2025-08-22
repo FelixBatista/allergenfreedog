@@ -733,65 +733,24 @@
     }
 
     function allergenClass(name, prefs){
-      const raw = cleanIngredientName(name);
-      // detect hydrolysed word anywhere
-      const hydroRegex = /\bhydroly(s|z)ed\b|\bhydroly(s|z)sed\b/g;
-      const hasHydro = hydroRegex.test(raw);
-
-      // helper: try to find a matching ingredient in master list for a given candidate string
-      function findIngredientCandidate(candidate){
-        if(!candidate) return null;
-        // exact match first
-        let found = ingredientMaster.find(im => cleanIngredientName(im.name) === candidate);
-        if(found) return found;
-        // try case where candidate contains master name or vice-versa (covers 'chicken liver' inside longer strings)
-        found = ingredientMaster.find(im => {
-          const m = cleanIngredientName(im.name);
-          return candidate.includes(m) || m.includes(candidate);
-        });
-        return found || null;
-      }
-
-      // strip hydrolysed and common suffixes like 'protein', 'gravy', 'extract' to get base candidate
-      const withoutHydro = raw.replace(hydroRegex, '').replace(/\b(protein|proteins|gravy|extract|powder|meal)\b/g, '').replace(/[^a-z0-9\s\-]/g,' ').replace(/\s+/g,' ').trim();
-
-      // attempt matches in order: exact raw, without hydro, then fuzzy contains
-      let ingredient = findIngredientCandidate(raw) || findIngredientCandidate(withoutHydro);
-
-      // if still not found, try token-based matching (look for any master token inside the raw string)
-      if(!ingredient){
-        for(const im of ingredientMaster){
-          const m = cleanIngredientName(im.name);
-          if(raw.includes(m) || withoutHydro.includes(m)) { ingredient = im; break; }
-        }
-      }
-
-      // If no matching ingredient found, default to safe
-      if(!ingredient) return 'ok';
-
+      const cleanName = cleanIngredientName(name);
+      const lowHydro = prefs.hydro && /hydroly(s|z)ed|hydroly(s|z)sed/.test(cleanName);
+      const ingredient = ingredientMaster.find(im => cleanIngredientName(im.name) === cleanName);
+      
+      if (!ingredient) return 'ok';
+      
       const tags = ingredient.tags || [];
-      // gluten / poultry checks
       if(prefs.noGluten && tags.includes('gluten')) return 'danger';
-      if(prefs.noPoultry && (raw.includes('poultry') || raw.includes('chicken') || withoutHydro.includes('poultry') || withoutHydro.includes('chicken'))) return 'danger';
-
-      // if hydrolysed and user treats hydrolysed as low risk -> safe
-      if(hasHydro && prefs.hydro) return 'ok';
-
-      // otherwise follow master risk level
+      if(prefs.noPoultry && (cleanName.includes('poultry') || cleanName.includes('chicken'))) return 'danger';
+      if(lowHydro) return 'ok';
       if(ingredient.risk_level === 'danger') return 'danger';
       if(ingredient.risk_level === 'warn') return 'warn';
       return 'ok';
     }
 
     function noteFor(name){
-      const raw = cleanIngredientName(name);
-      // reuse matching logic: prefer exact then without hydro
-      const hydroRegex = /\bhydroly(s|z)ed\b|\bhydroly(s|z)sed\b/g;
-      const withoutHydro = raw.replace(hydroRegex, '').replace(/\b(protein|proteins|gravy|extract|powder|meal)\b/g, '').replace(/[^a-z0-9\s\-]/g,' ').replace(/\s+/g,' ').trim();
-      let ingredient = ingredientMaster.find(im => cleanIngredientName(im.name) === raw) || ingredientMaster.find(im => cleanIngredientName(im.name) === withoutHydro);
-      if(!ingredient){
-        ingredient = ingredientMaster.find(im => raw.includes(cleanIngredientName(im.name)) || withoutHydro.includes(cleanIngredientName(im.name)));
-      }
+      const cleanName = cleanIngredientName(name);
+      const ingredient = ingredientMaster.find(im => cleanIngredientName(im.name) === cleanName);
       return ingredient ? ingredient.note : '';
     }
 
