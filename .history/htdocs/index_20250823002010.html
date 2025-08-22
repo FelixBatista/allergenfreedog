@@ -387,13 +387,11 @@
   </div>
 
   <script>
-  // Global variables
-  let nonSimilarIngredients = [];
-  let triggeringFoodsData = [];
-  let foodCatalog = [];
-  let ingredientMaster = [];
-  // store last comparison so toggles can re-render without re-calling the API
-  let lastComparison = null;
+    // Global variables
+    let nonSimilarIngredients = [];
+    let triggeringFoodsData = [];
+    let foodCatalog = [];
+    let ingredientMaster = [];
 
     // Initialize the application
     async function initializeApp() {
@@ -916,15 +914,12 @@
           throw new Error(result.message || 'Comparison failed');
         }
         
-  // Store triggering foods data for safe food finder
-  triggeringFoodsData = triggering;
-  nonSimilarIngredients = result.data.nonSimilarIngredients;
-
-  // Store last comparison data so we can re-render when toggles change
-  lastComparison = { comparisonData: result.data.comparisonTable, triggering, safe };
-
-  // Build and display comparison table
-  displayComparisonTable(result.data.comparisonTable, triggering, safe, prefs);
+        // Store triggering foods data for safe food finder
+        triggeringFoodsData = triggering;
+        nonSimilarIngredients = result.data.nonSimilarIngredients;
+        
+        // Build and display comparison table
+        displayComparisonTable(result.data.comparisonTable, triggering, safe, prefs);
         
         // Show the safe food finder
         document.getElementById('safeFoodFinder').style.display = 'block';
@@ -1145,27 +1140,6 @@
     
     // Initialize the app when DOM is loaded
     document.addEventListener('DOMContentLoaded', initializeApp);
-
-    // Live re-render when gluten/poultry toggles change (apply immediately to the existing table)
-    document.getElementById('noGluten').addEventListener('change', ()=>{
-      if(!lastComparison) return;
-      const prefs = {
-        noGluten: document.getElementById('noGluten').checked,
-        noPoultry: document.getElementById('noPoultry').checked,
-        hydro: document.getElementById('hydrolysedLow').checked
-      };
-      displayComparisonTable(lastComparison.comparisonData, lastComparison.triggering, lastComparison.safe, prefs);
-    });
-
-    document.getElementById('noPoultry').addEventListener('change', ()=>{
-      if(!lastComparison) return;
-      const prefs = {
-        noGluten: document.getElementById('noGluten').checked,
-        noPoultry: document.getElementById('noPoultry').checked,
-        hydro: document.getElementById('hydrolysedLow').checked
-      };
-      displayComparisonTable(lastComparison.comparisonData, lastComparison.triggering, lastComparison.safe, prefs);
-    });
   </script>
 </body>
 </html>
