@@ -239,11 +239,6 @@
             <button type="button" class="chip" data-filter="overlap">Overlaps only</button>
           </div>
 
-          <div class="field" style="max-width:320px;margin-top:6px">
-            <label for="brandFilter">Filter dog food by brand (optional)</label>
-            <select id="brandFilter"><option value="">All brands</option></select>
-          </div>
-
           <div class="grid two-col-form">
             <div class="field">
               <label>Triggering Foods (Foods that caused problems)</label>
@@ -395,49 +390,13 @@
           loadFoodCatalog(),
           loadIngredientMaster()
         ]);
-  // populate brand filter then initialize entries
-  populateBrandFilter();
-  initializeFoodEntries();
+        
+        initializeFoodEntries();
         console.log('Application initialized successfully');
       } catch (error) {
         console.error('Failed to initialize application:', error);
         showError('Failed to load application data. Please refresh the page.');
       }
-    }
-
-    function populateBrandFilter(){
-      const sel = document.getElementById('brandFilter');
-      if(!sel) return;
-      // Build a map of lowercase -> original casing (first occurrence)
-      const brandMap = {};
-      foodCatalog.forEach(f => {
-        const raw = (f.brand||'').trim();
-        if(!raw) return;
-        const key = raw.toLowerCase();
-        if(!(key in brandMap)) brandMap[key] = raw; // keep first/original casing
-      });
-      const keys = Object.keys(brandMap).sort();
-      sel.innerHTML = '<option value="">All brands</option>' + keys.map(k=>`<option value="${k}">${brandMap[k]}</option>`).join('');
-      // remove any existing change listeners by cloning the node
-      const newSel = sel.cloneNode(true);
-      sel.parentNode.replaceChild(newSel, sel);
-      newSel.addEventListener('change', ()=>{
-        // refresh every food select options
-        document.querySelectorAll('.foodEntry').forEach(fe=>{
-          const selEl = fe.querySelector('.foodSelect');
-          // rebuild options preserving selection where possible
-          const prev = selEl.value;
-          selEl.innerHTML='';
-          const noneOp = document.createElement('option'); noneOp.value='(none)'; noneOp.textContent='(none)'; selEl.append(noneOp);
-          const brandFilter = (newSel.value||'').trim().toLowerCase();
-          foodCatalog.filter(f => !brandFilter || ((f.brand||'').trim().toLowerCase() === brandFilter)).forEach(f => {
-            const text = `${f.brand}${f.brand? ' - ':' '}${f.name}`.trim();
-            const op = document.createElement('option'); op.value = text; op.textContent = text; selEl.append(op);
-          });
-          const customOp = document.createElement('option'); customOp.value='Custom (paste)'; customOp.textContent='Custom (paste)'; selEl.append(customOp);
-          try{ selEl.value = prev; }catch(e){}
-        });
-      });
     }
 
     // Load food catalog from API
@@ -595,17 +554,14 @@
       const textarea = entry.querySelector('.foodText');
       const suggestionsDiv = entry.querySelector('.ingredient-suggestions');
       
-      // Build options for this select respecting brand filter
-  const brandFilter = ((document.getElementById('brandFilter') && document.getElementById('brandFilter').value) || '').trim().toLowerCase();
-  const noneOp = document.createElement('option'); noneOp.value='(none)'; noneOp.textContent='(none)'; select.append(noneOp);
-  foodCatalog.filter(f => !brandFilter || ((f.brand||'').trim().toLowerCase() === brandFilter)).forEach(f => {
+      // Build options for this select
+      const options = ["(none)", ...foodCatalog.map(f => `${f.brand} - ${f.name}`), "Custom (paste)"];
+      options.forEach(o => {
         const op = document.createElement('option');
-        const text = `${f.brand}${f.brand? ' - ':' '}${f.name}`.trim();
-        op.value = text;
-        op.textContent = text;
+        op.value = o; 
+        op.textContent = o; 
         select.append(op);
       });
-      const customOp = document.createElement('option'); customOp.value='Custom (paste)'; customOp.textContent='Custom (paste)'; select.append(customOp);
       
       select.value = defaultValue;
       
