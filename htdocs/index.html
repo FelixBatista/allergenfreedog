@@ -166,6 +166,13 @@
     .modal{position:fixed;inset:0;display:none;place-items:center;background:rgba(0,0,0,.35);padding:24px;z-index:10}
     .modal.open{display:grid}
     .modal .sheet{max-width:900px;width:100%;background:var(--card);border-radius:20px;box-shadow:var(--shadow)}
+    .modal-content{max-width:500px;width:100%;background:var(--card);border-radius:20px;box-shadow:var(--shadow);padding:0;overflow:hidden}
+    .modal-header{display:flex;justify-content:space-between;align-items:center;padding:24px;border-bottom:1px solid #e9e1d7}
+    .modal-header h2{margin:0;color:var(--ink)}
+    .modal-close{background:none;border:none;font-size:24px;cursor:pointer;color:var(--muted);padding:0;width:32px;height:32px;display:flex;align-items:center;justify-content:center}
+    .modal-close:hover{color:var(--ink)}
+    .modal-body{padding:24px}
+    #loginBtn:hover{background:#3367d6 !important; transform:translateY(-1px); box-shadow:0 4px 12px rgba(66,133,244,0.3)}
     .sheet .head{display:flex;justify-content:space-between;align-items:center;padding:14px 18px;border-bottom:1px solid #eef2ef}
     .sheet h3{margin:0}
     .sheet .body{padding:12px 18px 22px}
@@ -236,36 +243,63 @@
       <div class="actions">
         <button class="btn ghost" id="openGlossary">Ingredient Glossary</button>
         <a class="btn ghost" href="allergy-testing.html">Allergy Testing Guide</a>
+        <button class="btn" id="loginBtn" style="display: none; background: #4285f4; color: white; border: none;">Log In</button>
+        <div id="userInfo" style="display: none;">
+          <span id="userName"></span>
+          <button class="btn ghost" id="logoutBtn">Log Out</button>
+        </div>
         <a class="btn primary" href="#compare">Compare Now</a>
       </div>
     </div>
   </header>
 
-  <div id="authDogPanel" class="container" style="margin:12px 0; display:flex; gap:12px; align-items:center; justify-content:stretch;">
-    <div id="authStatus" style="display:flex; align-items:center; gap:12px; flex:1;">
-      <img id="userAvatar" src="" alt="User avatar" style="width:28px;height:28px;border-radius:50%;display:none;"/>
-      <span id="userName" style="font-weight:700;">Not signed in</span>
-    </div>
-    <div id="authControls" style="flex:0 0 auto; display:flex; gap:8px; align-items:center;">
-      <button id="googleSignInBtn" class="btn primary">Sign in with Google</button>
-      <button id="googleSignOutBtn" class="btn ghost" style="display:none;">Sign out</button>
-    </div>
-  </div>
-
-  <div id="dogPanel" class="container card" style="margin:12px 0; display:flex; gap:12px; align-items:center; justify-content:space-between;">
-    <div style="display:flex; flex-direction:column; min-width:240px;">
-      <label for="dogSelect" style="font-weight:700; margin-bottom:4px;">Your Dogs</label>
-      <select id="dogSelect" style="min-width:240px;"></select>
-    </div>
-    <div style="display:flex; flex-direction:column;">
-      <label for="newDog" style="font-weight:700; margin-bottom:4px;">Add a dog</label>
-      <div style="display:flex; gap:8px; align-items:center;">
-        <input type="text" id="newDog" placeholder="Dog name" style="padding:8px 12px; border-radius:8px; border:1px solid #ccc; min-width:180px;"/>
-        <button id="addDogBtn" class="btn ghost" style="padding:8px 12px;">Add</button>
-        <button id="loadLastBtn" class="btn ghost" style="padding:8px 12px;" disabled>Load last comparison</button>
+  <!-- Direct Login Dialog Modal -->
+  <div id="loginDialog" class="modal" style="display: none;">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>Sign In</h2>
+        <button class="modal-close" id="closeLoginDialog">&times;</button>
+      </div>
+      <div class="modal-body">
+        <p>Sign in with Google to access your saved data and preferences.</p>
+        <div id="googleSignInButton" style="margin: 20px 0;"></div>
+        <div id="dogManagement" style="display: none;">
+          <h3>Your Dogs</h3>
+          <div id="dogList"></div>
+          <div id="createDogSection">
+            <input type="text" id="newDogName" placeholder="Enter dog name" style="margin-right: 8px;">
+            <button id="addDogBtn" class="btn primary">Add Dog</button>
+          </div>
+        </div>
       </div>
     </div>
   </div>
+
+  <!-- Save Comparison Dialog Modal -->
+  <div id="saveComparisonDialog" class="modal" style="display: none;">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>Sign In to Save Comparisons</h2>
+        <button class="modal-close" id="closeSaveComparisonDialog">&times;</button>
+      </div>
+      <div class="modal-body">
+        <p>Sign in with Google to save your dog profiles and food comparisons for later. This allows you to:</p>
+        <ul style="margin: 16px 0; padding-left: 20px;">
+          <li>Save comparison results for each of your dogs</li>
+          <li>Load previous comparisons instantly</li>
+          <li>Get personalized suggestions based on your dog's history</li>
+        </ul>
+        <div id="saveComparisonGoogleSignInButton" style="margin: 20px 0;"></div>
+        <p style="font-size: 14px; color: var(--muted); margin-top: 16px;">
+          Don't worry - you can still use the comparison tool without signing in!
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <!-- auth panel removed; login handled via dialog (not inlined) -->
+
+<!-- dog panel removed; dog management via login dialog and Firestore flow -->
 
   <div id="noDogsMessage" class="container card" style="margin:12px 0; display:none;">
     <p>No dogs found for your account. Create a dog to start saving comparisons and getting suggestions.</p>
@@ -442,6 +476,13 @@
   let ingredientMaster = [];
   // store last comparison so toggles can re-render without re-calling the API
   let lastComparison = null;
+  
+  // Auth and Firebase variables
+  let gisUser = null;
+  let currentDogId = null;
+  let userDogs = [];
+  let auth = null;
+  let db = null;
 
     // Initialize the application
     async function initializeApp() {
@@ -454,8 +495,6 @@
   populateBrandFilter();
   initializeFoodEntries();
         console.log('Application initialized successfully');
-        // Initialize Firebase after app load
-        initializeFirebase();
       } catch (error) {
         console.error('Failed to initialize application:', error);
         showError('Failed to load application data. Please refresh the page.');
@@ -1243,114 +1282,321 @@
   </script>
 
   <script>
-    // Firebase config (load from git-ignored file if available)
-    // Attempt to fetch local config (ignored in git by default)
-    (async () => {
+    // Consolidated Firebase initialization and auth management
+    (async function() {
+      // Load Firebase config from git-ignored file if present
       try {
         const resp = await fetch('config/firebase.config.js', { cache: 'no-store' });
         if (resp.ok) {
-          // The config file exports an object that assigns to window.__firebaseConfig
-          // We simply load it by executing the script
           const text = await resp.text();
-          // If the file is a JS that defines window.__firebaseConfig, evaluate it safely
-          // eslint-disable-next-line no-new-func
           new Function(text)();
-          // If the file ran and set window.__firebaseConfig, it will be used later
         }
       } catch (e) {
-        // ignore, will use placeholder below
+        console.warn('Could not load Firebase config, using defaults');
       }
-    })();
-    // Fallback placeholder (will be overridden if firebase.config.js sets window.__firebaseConfig)
-    var firebaseConfig = window.__firebaseConfig || {
-      apiKey: "YOUR_API_KEY",
-      authDomain: "YOUR_AUTH_DOMAIN",
-      projectId: "YOUR_PROJECT_ID",
-      storageBucket: "YOUR_STORAGE_BUCKET",
-      messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
-      appId: "YOUR_APP_ID"
-    };
 
-    let firebaseApp = null;
-    let auth = null;
-    let db = null;
+      const cfg = window.__firebaseConfig || {
+        apiKey: 'YOUR_API_KEY',
+        authDomain: 'YOUR_AUTH_DOMAIN',
+        projectId: 'YOUR_PROJECT_ID',
+        storageBucket: 'YOUR_STORAGE_BUCKET',
+        messagingSenderId: 'YOUR_MESSAGING_SENDER_ID',
+        appId: 'YOUR_APP_ID'
+      };
 
-    function initializeFirebase(){
-      if (window.__firebase_initialized) return;
-      window.__firebase_initialized = true;
-      if(!window.firebase) {
-        console.warn('Firebase SDK not loaded.');
-        return;
+      // Wait for Firebase to load
+      while (typeof firebase === 'undefined') {
+        await new Promise(resolve => setTimeout(resolve, 100));
       }
-      // Initialize app
-      firebaseApp = firebase.apps.length ? firebase.apps[0] : firebase.initializeApp(firebaseConfig);
+
+      // Initialize Firebase
+      const app = firebase.apps.length ? firebase.apps[0] : firebase.initializeApp(cfg);
       auth = firebase.auth();
       db = firebase.firestore();
 
       // Auth state listener
       auth.onAuthStateChanged(async (user) => {
-        if(user){
-          // Persist some basic info in local state and storage
-          const token = await user.getIdToken();
-          // Load dog data for this user (we'll fetch on demand in UI logic as well)
-          // For now, just refresh UI sign-in state
+        if (user) {
           gisUser = { name: user.displayName || user.email, avatar: user.photoURL || '' };
-          // Load dogs for the user (optional: we could fetch from Firestore here)
-          // If you implement teams, fetch and populate localDogs and dogSelect here
+          await loadUserData(user.uid);
+          updateAuthUI(true);
         } else {
           gisUser = null;
+          currentDogId = null;
+          userDogs = [];
+          updateAuthUI(false);
         }
-        renderAuthUI();
-        saveToStorage();
       });
-    }
 
-    // Save current dog comparison to Firestore (per-user)
-    async function saveComparisonToFirestore(dogId, comparisonData){
-      if(!auth || !db) return false;
-      if(!auth.currentUser) return false;
-      const uid = auth.currentUser.uid;
-      const path = `users/${uid}/dogs/${dogId}/comparisons`;
-      const ref = db.collection(path);
-      await ref.add({ data: comparisonData, createdAt: new Date() });
-      return true;
-    }
+      // Initialize UI event listeners
+      initializeAuthUI();
+    })();
 
-    // Load last comparison from Firestore for a dog
-    async function loadLastComparisonFromFirestore(dogId){
-      if(!auth || !db) return null;
-      if(!auth.currentUser) return null;
-      const uid = auth.currentUser.uid;
-      const path = `users/${uid}/dogs/${dogId}/comparisons`;
-      const coll = db.collection(path).orderBy('createdAt','desc').limit(1);
-      const snap = await coll.get();
-      if(!snap.empty){ return snap.docs[0].data().data; }
-      return null;
-    }
+    // Auth UI management
+    function updateAuthUI(isLoggedIn) {
+      const loginBtn = document.getElementById('loginBtn');
+      const userInfo = document.getElementById('userInfo');
+      const userName = document.getElementById('userName');
+      const noDogsMessage = document.getElementById('noDogsMessage');
+      const dogManagement = document.getElementById('dogManagement');
 
-    async function loadUserDogsFromFirestore(userId){
-      if(!db) return;
-      const ref = db.collection('users').doc(userId).collection('dogs');
-      const snap = await ref.get();
-      localDogs = [];
-      snap.forEach(doc => {
-        const d = doc.data();
-        const id = doc.id;
-        localDogs.push({ id, name: d.name || id, lastComparison: null });
-      });
-      // Update UI
-      currentDogId = localDogs[0]?.id || null;
-      renderDogSelect();
-      // UX: if user has no dogs, show friendly message
-      if (localDogs.length === 0) {
-        document.getElementById('noDogsMessage').style.display = 'block';
-        document.getElementById('dogPanel').style.display = 'none';
+      if (isLoggedIn) {
+        loginBtn.style.display = 'none';
+        userInfo.style.display = 'flex';
+        userName.textContent = gisUser.name;
+        
+        if (userDogs.length === 0) {
+          noDogsMessage.style.display = 'block';
+          dogManagement.style.display = 'none';
+        } else {
+          noDogsMessage.style.display = 'none';
+          dogManagement.style.display = 'block';
+          renderDogList();
+        }
       } else {
-        document.getElementById('noDogsMessage').style.display = 'none';
-        document.getElementById('dogPanel').style.display = 'flex';
+        loginBtn.style.display = 'inline-block';
+        userInfo.style.display = 'none';
+        noDogsMessage.style.display = 'none';
+        dogManagement.style.display = 'none';
       }
-      saveToStorage();
     }
+
+    function initializeAuthUI() {
+      // Login button - direct login dialog
+      document.getElementById('loginBtn').addEventListener('click', () => {
+        document.getElementById('loginDialog').style.display = 'flex';
+        initializeGoogleSignIn('googleSignInButton');
+      });
+
+      // Logout button
+      document.getElementById('logoutBtn').addEventListener('click', () => {
+        auth.signOut();
+      });
+
+      // Close dialogs
+      document.getElementById('closeLoginDialog').addEventListener('click', () => {
+        document.getElementById('loginDialog').style.display = 'none';
+      });
+
+      document.getElementById('closeSaveComparisonDialog').addEventListener('click', () => {
+        document.getElementById('saveComparisonDialog').style.display = 'none';
+      });
+
+      // Add dog button
+      document.getElementById('addDogBtn').addEventListener('click', addDog);
+
+      // Create demo dog button
+      document.getElementById('createDemoDog').addEventListener('click', () => {
+        document.getElementById('newDogName').value = 'Demo Dog';
+        addDog();
+      });
+
+      // Close dialogs when clicking outside
+      document.getElementById('loginDialog').addEventListener('click', (e) => {
+        if (e.target.id === 'loginDialog') {
+          document.getElementById('loginDialog').style.display = 'none';
+        }
+      });
+
+      document.getElementById('saveComparisonDialog').addEventListener('click', (e) => {
+        if (e.target.id === 'saveComparisonDialog') {
+          document.getElementById('saveComparisonDialog').style.display = 'none';
+        }
+      });
+
+      // Wire save comparison trigger
+      wireSaveComparisonTrigger();
+    }
+
+    function initializeGoogleSignIn(buttonId = 'googleSignInButton') {
+      if (window.google) {
+        google.accounts.id.initialize({
+          client_id: cfg.apiKey, // This should be your OAuth client ID
+          callback: handleGoogleSignIn
+        });
+        google.accounts.id.renderButton(
+          document.getElementById(buttonId),
+          { theme: 'outline', size: 'large' }
+        );
+      }
+    }
+
+    function wireSaveComparisonTrigger() {
+      // Find the form submission or save button and add the trigger
+      const compareForm = document.getElementById('compare');
+      if (compareForm) {
+        compareForm.addEventListener('submit', (e) => {
+          // Check if user is logged in before allowing save
+          if (!auth.currentUser) {
+            e.preventDefault();
+            document.getElementById('saveComparisonDialog').style.display = 'flex';
+            initializeGoogleSignIn('saveComparisonGoogleSignInButton');
+            return false;
+          }
+        });
+      }
+    }
+
+    function handleGoogleSignIn(response) {
+      const credential = firebase.auth.GoogleAuthProvider.credential(response.credential);
+      auth.signInWithCredential(credential);
+      // Close both dialogs
+      document.getElementById('loginDialog').style.display = 'none';
+      document.getElementById('saveComparisonDialog').style.display = 'none';
+    }
+
+    async function loadUserData(userId) {
+      try {
+        // Load user's dogs
+        const dogsSnapshot = await db.collection('users').doc(userId).collection('dogs').get();
+        userDogs = [];
+        dogsSnapshot.forEach(doc => {
+          userDogs.push({ id: doc.id, ...doc.data() });
+        });
+
+        // Select first dog if available
+        if (userDogs.length > 0) {
+          currentDogId = userDogs[0].id;
+          await loadLastComparison(currentDogId);
+        }
+      } catch (error) {
+        console.error('Error loading user data:', error);
+        showError('Failed to load your data. Please try again.');
+      }
+    }
+
+    function renderDogList() {
+      const dogList = document.getElementById('dogList');
+      dogList.innerHTML = userDogs.map(dog => 
+        `<div class="dog-item" style="padding: 8px; border: 1px solid #e9e1d7; margin: 4px 0; border-radius: 8px; cursor: pointer; ${dog.id === currentDogId ? 'background: var(--primary); color: white;' : ''}" data-dog-id="${dog.id}">
+          ${dog.name}
+        </div>`
+      ).join('');
+
+      // Add click listeners
+      dogList.querySelectorAll('.dog-item').forEach(item => {
+        item.addEventListener('click', async () => {
+          currentDogId = item.dataset.dogId;
+          renderDogList(); // Re-render to update selection
+          await loadLastComparison(currentDogId);
+        });
+      });
+    }
+
+    async function addDog() {
+      const dogName = document.getElementById('newDogName').value.trim();
+      if (!dogName) {
+        alert('Please enter a dog name');
+        return;
+      }
+
+      if (!auth.currentUser) {
+        alert('Please sign in first');
+        return;
+      }
+
+      try {
+        const dogData = {
+          name: dogName,
+          createdAt: firebase.firestore.FieldValue.serverTimestamp()
+        };
+
+        const docRef = await db.collection('users').doc(auth.currentUser.uid).collection('dogs').add(dogData);
+        userDogs.push({ id: docRef.id, ...dogData });
+        currentDogId = docRef.id;
+        
+        document.getElementById('newDogName').value = '';
+        updateAuthUI(true);
+        showSuccess('Dog added successfully!');
+      } catch (error) {
+        console.error('Error adding dog:', error);
+        showError('Failed to add dog. Please try again.');
+      }
+    }
+
+    async function loadLastComparison(dogId) {
+      if (!dogId) return;
+
+      try {
+        const comparisonsSnapshot = await db.collection('users').doc(auth.currentUser.uid)
+          .collection('dogs').doc(dogId).collection('comparisons')
+          .orderBy('timestamp', 'desc').limit(1).get();
+
+        if (!comparisonsSnapshot.empty) {
+          const comparison = comparisonsSnapshot.docs[0].data();
+          // Render the comparison in the UI
+          renderComparison(comparison);
+        }
+      } catch (error) {
+        console.error('Error loading last comparison:', error);
+      }
+    }
+
+    function renderComparison(comparison) {
+      // This would integrate with your existing comparison rendering logic
+      console.log('Loading comparison:', comparison);
+      // You can implement the specific rendering logic here based on your existing code
+    }
+
+    // Firestore functions for saving/loading comparisons
+    async function saveComparisonToFirestore(dogId, data) {
+      if (!auth.currentUser || !dogId) return false;
+
+      try {
+        await db.collection('users').doc(auth.currentUser.uid)
+          .collection('dogs').doc(dogId).collection('comparisons').add({
+            ...data,
+            timestamp: firebase.firestore.FieldValue.serverTimestamp()
+          });
+        return true;
+      } catch (error) {
+        console.error('Error saving comparison:', error);
+        return false;
+      }
+    }
+
+    async function loadLastComparisonFromFirestore(dogId) {
+      if (!auth.currentUser || !dogId) return null;
+
+      try {
+        const snapshot = await db.collection('users').doc(auth.currentUser.uid)
+          .collection('dogs').doc(dogId).collection('comparisons')
+          .orderBy('timestamp', 'desc').limit(1).get();
+        
+        return snapshot.empty ? null : snapshot.docs[0].data();
+      } catch (error) {
+        console.error('Error loading comparison:', error);
+        return null;
+      }
+    }
+
+    async function loadUserDogsFromFirestore(userId) {
+      if (!userId) return [];
+
+      try {
+        const snapshot = await db.collection('users').doc(userId).collection('dogs').get();
+        return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+      } catch (error) {
+        console.error('Error loading dogs:', error);
+        return [];
+      }
+    }
+
+    // Utility functions
+    function showError(message) {
+      // You can implement a toast notification system here
+      alert('Error: ' + message);
+    }
+
+    function showSuccess(message) {
+      // You can implement a toast notification system here
+      alert('Success: ' + message);
+    }
+
+    // Expose functions globally for compatibility
+    window.saveComparisonToFirestore = saveComparisonToFirestore;
+    window.loadLastComparisonFromFirestore = loadLastComparisonFromFirestore;
+    window.loadUserDogsFromFirestore = loadUserDogsFromFirestore;
   </script>
 </body>
 </html>

@@ -1,0 +1,24 @@
+// Firestore Security Rules for Allergy Free Dog
+// Copy these rules to your Firebase Console > Firestore Database > Rules
+
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Users collection
+    match /users/{userId} {
+      // User documents: only the owning user can read/write
+      allow read, write: if request.auth != null && request.auth.uid == userId;
+
+      // Dogs subcollection
+      match /dogs/{dogId} {
+        // Each dog document is owned by its user
+        allow read, write: if request.auth != null && request.auth.uid == userId;
+
+        // Comparisons subcollection under each dog
+        match /comparisons/{compId} {
+          allow read, write: if request.auth != null && request.auth.uid == userId;
+        }
+      }
+    }
+  }
+}
