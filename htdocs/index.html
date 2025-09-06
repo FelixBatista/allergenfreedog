@@ -163,8 +163,11 @@
     footer .inner{display:flex;flex-wrap:wrap;gap:12px;justify-content:space-between;align-items:center;padding:18px 0;color:var(--muted)}
 
     /* Modal */
-    .modal{position:fixed;inset:0;display:none;place-items:center;background:rgba(0,0,0,.35);padding:24px;z-index:10}
-    .modal.open{display:grid}
+    .modal{position:fixed;inset:0;display:none;align-items:center;justify-content:center;background:rgba(0,0,0,.35);padding:24px;z-index:10;overflow-y:auto}
+    .modal.open{display:flex}
+    @media (max-height: 600px) {
+      .modal{align-items:flex-start;padding-top:60px}
+    }
     .modal .sheet{max-width:900px;width:100%;background:var(--card);border-radius:20px;box-shadow:var(--shadow)}
     .modal-content{max-width:500px;width:100%;background:var(--card);border-radius:20px;box-shadow:var(--shadow);padding:0;overflow:hidden}
     .modal-header{display:flex;justify-content:space-between;align-items:center;padding:24px;border-bottom:1px solid #e9e1d7}
@@ -1409,15 +1412,33 @@
     }
 
     function initializeGoogleSignIn(buttonId = 'googleSignInButton') {
-      if (window.google) {
+      if (window.google && window.google.accounts && window.google.accounts.id) {
+        const clientId = cfg.clientId || cfg.apiKey;
+        if (!clientId || clientId === 'YOUR_API_KEY' || clientId === 'YOUR_OAUTH_CLIENT_ID.apps.googleusercontent.com') {
+          console.error('Google Sign-In: Client ID not configured properly');
+          showError('Google Sign-In not configured. Please check your Firebase config.');
+          return;
+        }
+
         google.accounts.id.initialize({
-          client_id: cfg.apiKey, // This should be your OAuth client ID
-          callback: handleGoogleSignIn
+          client_id: clientId,
+          callback: handleGoogleSignIn,
+          auto_select: false,
+          cancel_on_tap_outside: true
         });
         google.accounts.id.renderButton(
           document.getElementById(buttonId),
-          { theme: 'outline', size: 'large' }
+          { 
+            theme: 'outline', 
+            size: 'large',
+            text: 'signin_with',
+            shape: 'rectangular',
+            logo_alignment: 'left'
+          }
         );
+      } else {
+        console.error('Google Identity Services not loaded');
+        showError('Google Sign-In service not available. Please refresh the page.');
       }
     }
 
@@ -1438,11 +1459,21 @@
     }
 
     function handleGoogleSignIn(response) {
-      const credential = firebase.auth.GoogleAuthProvider.credential(response.credential);
-      auth.signInWithCredential(credential);
-      // Close both dialogs
-      document.getElementById('loginDialog').style.display = 'none';
-      document.getElementById('saveComparisonDialog').style.display = 'none';
+      // Handle the Google Identity Services response
+      if (response.credential) {
+        const credential = firebase.auth.GoogleAuthProvider.credential(response.credential);
+        auth.signInWithCredential(credential).then(() => {
+          // Close both dialogs
+          document.getElementById('loginDialog').style.display = 'none';
+          document.getElementById('saveComparisonDialog').style.display = 'none';
+        }).catch((error) => {
+          console.error('Sign-in error:', error);
+          showError('Sign-in failed. Please try again.');
+        });
+      } else {
+        console.error('No credential received from Google Sign-In');
+        showError('Sign-in failed. Please try again.');
+      }
     }
 
     async function loadUserData(userId) {
