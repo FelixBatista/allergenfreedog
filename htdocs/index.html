@@ -217,6 +217,11 @@
     .suggestions-grid::-webkit-scrollbar-thumb:hover{background:var(--primary-dark)}
     .product-card{background:white; border-radius:12px; box-shadow:0 4px 12px rgba(0,0,0,0.1); border:1px solid #e9e1d7; overflow:hidden; transition:all 0.3s ease; width:250px; min-width:250px; flex-shrink:0; text-decoration:none; color:inherit}
     .product-card:hover{transform:translateY(-4px); box-shadow:0 8px 20px rgba(0,0,0,0.15); text-decoration:none; color:inherit}
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
     .product-image{width:100%; height:180px; object-fit:cover; background:#f8f9fa; display:flex; align-items:center; justify-content:center; font-size:48px; color:#ddd}
     .product-info{padding:16px; text-align:center}
     .product-name{font-weight:600; font-size:14px; line-height:1.4; margin:0 0 8px 0; color:var(--ink); display:-webkit-box; -webkit-line-clamp:2; line-clamp:2; -webkit-box-orient:vertical; overflow:hidden}
@@ -559,7 +564,7 @@
       
       <div class="suggestions-footer" style="text-align: center; margin-top: 16px;">
         <p class="muted" style="font-size: 14px;">
-          <em>These recommendations are based on ingredient analysis. Always consult with your veterinarian before changing your dog's diet.</em>
+          <em>These recommendations are based on ingredient analysis. Make sure to check the ingredients before you try it out. Always consult with your veterinarian before changing your dog's diet.</em>
         </p>
       </div>
     </section>
@@ -2236,39 +2241,97 @@
       }
     }
 
-    // Function to get Amazon product image URL
-    function getAmazonImageUrl(asin) {
-      // Use Amazon's product image URL pattern with common image IDs
-      // These are real image IDs that work for dog food products
-      const imageIds = {
-        'B00CNVBCLA': '71QZQZQZQZQ', // Royal Canin MAXI Adult
-        'B07L5FF4W3': '81QZQZQZQZQ', // Hill's Science Diet Chicken & Barley  
-        'B01I3K10ZC': '51QZQZQZQZQ'  // Orijen Original
-      };
-      
-      const imageId = imageIds[asin] || '41QZQZQZQZQ'; // Default fallback
-      return `https://m.media-amazon.com/images/I/${imageId}._AC_SX679_.jpg`;
+    // Function to fetch Amazon product image using our PHP proxy
+    async function fetchAmazonImage(asin) {
+      try {
+        // Use our PHP proxy to fetch Amazon images
+        const response = await fetch(`api/amazon_images.php?asin=${asin}`);
+        const data = await response.json();
+        
+        if (data.success && data.image) {
+          return data.image;
+        }
+        return null;
+      } catch (error) {
+        console.log('Amazon image fetch error:', error);
+        return null;
+      }
     }
 
-    // Function to get fallback image URL for products without ASIN
-    function getFallbackImageUrl(product) {
-      // Generate a consistent fallback image based on product name
+    // Function to load Amazon product image with fallback
+    async function loadAmazonImage(img, product) {
+      const asin = product.asin;
+      if (!asin) {
+        img.style.display = 'none';
+        img.nextElementSibling.style.display = 'flex';
+        return;
+      }
+
+      // Show loading state
+      img.style.display = 'none';
+      img.nextElementSibling.style.display = 'flex';
+      img.nextElementSibling.innerHTML = `
+        <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%;">
+          <div style="width: 20px; height: 20px; border: 2px solid #fff; border-top: 2px solid transparent; border-radius: 50%; animation: spin 1s linear infinite;"></div>
+          <span style="font-size: 12px; margin-top: 8px;">Loading...</span>
+        </div>
+      `;
+
+      try {
+        // Try to fetch the Amazon image
+        const imageUrl = await fetchAmazonImage(asin);
+        
+        if (imageUrl) {
+          // Amazon image found, load it
+          img.src = imageUrl;
+          img.style.display = 'block';
+          img.nextElementSibling.style.display = 'none';
+        } else {
+          // No Amazon image, show branded fallback
+          showBrandedFallback(img, product);
+        }
+      } catch (error) {
+        console.log('Error loading Amazon image:', error);
+        showBrandedFallback(img, product);
+      }
+    }
+
+    // Function to show branded fallback
+    function showBrandedFallback(img, product) {
+      img.style.display = 'none';
+      img.nextElementSibling.style.display = 'flex';
+      img.nextElementSibling.innerHTML = `
+        <div style="display: flex; align-items: center; justify-content: center; height: 100%; background: linear-gradient(135deg, ${getProductColor(product)}, ${getProductColor(product, true)}); color: white; font-size: 48px; flex-direction: column;">
+          <span>🐕</span>
+          <span style="font-size: 12px; margin-top: 8px; text-align: center; padding: 0 8px;">${product.brand}</span>
+        </div>
+      `;
+    }
+
+    // Function to get product color for fallback display
+    function getProductColor(product, isSecondary = false) {
       const productHash = product.name.split('').reduce((a, b) => {
         a = ((a << 5) - a) + b.charCodeAt(0);
         return a & a;
       }, 0);
       
-      // Use a placeholder service or generate a consistent color
-      const colors = ['#ff6b6b', '#4ecdc4', '#45b7d1', '#96ceb4', '#feca57', '#ff9ff3'];
-      const colorIndex = Math.abs(productHash) % colors.length;
+      const colors = [
+        ['#ff6b6b', '#ff8e8e'],
+        ['#4ecdc4', '#6dd5d0'],
+        ['#45b7d1', '#6bc5d8'],
+        ['#96ceb4', '#a8d4c1'],
+        ['#feca57', '#fed766'],
+        ['#ff9ff3', '#ffb3f7']
+      ];
       
-      return `data:image/svg+xml,${encodeURIComponent(`
-        <svg width="250" height="180" xmlns="http://www.w3.org/2000/svg">
-          <rect width="100%" height="100%" fill="${colors[colorIndex]}"/>
-          <text x="50%" y="50%" text-anchor="middle" dy=".3em" fill="white" font-family="Arial, sans-serif" font-size="24">🐕</text>
-          <text x="50%" y="70%" text-anchor="middle" dy=".3em" fill="white" font-family="Arial, sans-serif" font-size="12">${product.brand}</text>
-        </svg>
-      `)}`;
+      const colorIndex = Math.abs(productHash) % colors.length;
+      return colors[colorIndex][isSecondary ? 1 : 0];
+    }
+
+    // Function to get fallback image URL for products without ASIN
+    function getFallbackImageUrl(product) {
+      // Return a simple placeholder that will be replaced by the div fallback
+      return 'data:image/svg+xml,<svg width="1" height="1" xmlns="http://www.w3.org/2000/svg"></svg>';
     }
 
     // Function to find safe food suggestions based on non-overlapping ingredients
@@ -2311,10 +2374,12 @@
       suggestionsGrid.innerHTML = safeProducts.map(product => `
         <a href="${generateAffiliateLink(product)}" target="_blank" rel="noopener noreferrer" class="product-card">
           <div class="product-image">
-            <img src="${product.asin ? getAmazonImageUrl(product.asin) : getFallbackImageUrl(product)}" 
-                 alt="${product.name}" 
-                 onerror="this.src='${getFallbackImageUrl(product)}';"
+            <img alt="${product.name}" 
                  style="width: 100%; height: 100%; object-fit: cover;">
+            <div style="display: flex; align-items: center; justify-content: center; height: 100%; background: linear-gradient(135deg, ${getProductColor(product)}, ${getProductColor(product, true)}); color: white; font-size: 48px; flex-direction: column;">
+              <span>🐕</span>
+              <span style="font-size: 12px; margin-top: 8px; text-align: center; padding: 0 8px;">${product.brand}</span>
+            </div>
           </div>
           <div class="product-info">
             <h3 class="product-name">${product.name}</h3>
@@ -2323,6 +2388,22 @@
           </div>
         </a>
       `).join('');
+
+      // Load Amazon images for products with ASINs
+      safeProducts.forEach(async (product, index) => {
+        const productCard = suggestionsGrid.children[index];
+        const img = productCard.querySelector('img');
+        const fallback = productCard.querySelector('.product-image > div');
+        
+        if (product.asin) {
+          // Try to load Amazon image
+          await loadAmazonImage(img, product);
+        } else {
+          // No ASIN, show fallback immediately
+          img.style.display = 'none';
+          fallback.style.display = 'flex';
+        }
+      });
 
       suggestionsSection.style.display = 'block';
     }
