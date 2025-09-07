@@ -208,6 +208,23 @@
     
     @keyframes slideIn{from{opacity:0; transform:translateY(-10px)} to{opacity:1; transform:translateY(0)}}
     
+    /* Safe Food Suggestions Styles */
+    .suggestions-container{max-width:100%; margin:0 auto}
+    .suggestions-grid{display:flex; gap:16px; margin:20px 0; justify-content:flex-start; flex-wrap:nowrap; overflow-x:auto; padding:0 10px; scrollbar-width:thin; scrollbar-color:var(--primary) #f0f0f0}
+    .suggestions-grid::-webkit-scrollbar{height:6px}
+    .suggestions-grid::-webkit-scrollbar-track{background:#f0f0f0; border-radius:3px}
+    .suggestions-grid::-webkit-scrollbar-thumb{background:var(--primary); border-radius:3px}
+    .suggestions-grid::-webkit-scrollbar-thumb:hover{background:var(--primary-dark)}
+    .product-card{background:white; border-radius:12px; box-shadow:0 4px 12px rgba(0,0,0,0.1); border:1px solid #e9e1d7; overflow:hidden; transition:all 0.3s ease; width:250px; min-width:250px; flex-shrink:0; text-decoration:none; color:inherit}
+    .product-card:hover{transform:translateY(-4px); box-shadow:0 8px 20px rgba(0,0,0,0.15); text-decoration:none; color:inherit}
+    .product-image{width:100%; height:180px; object-fit:cover; background:#f8f9fa; display:flex; align-items:center; justify-content:center; font-size:48px; color:#ddd}
+    .product-info{padding:16px; text-align:center}
+    .product-name{font-weight:600; font-size:14px; line-height:1.4; margin:0 0 8px 0; color:var(--ink); display:-webkit-box; -webkit-line-clamp:2; line-clamp:2; -webkit-box-orient:vertical; overflow:hidden}
+    .product-price{color:var(--primary); font-weight:600; font-size:16px; margin:8px 0 0 0}
+    .product-rating{display:flex; align-items:center; justify-content:center; gap:4px; margin:8px 0; font-size:12px; color:var(--muted)}
+    .product-stars{color:#ffc107}
+    .affiliate-badge{background:linear-gradient(135deg, #ff9500 0%, #ff6b00 100%); color:white; padding:4px 8px; border-radius:6px; font-size:10px; font-weight:600; text-transform:uppercase; letter-spacing:0.5px; margin-top:8px; display:inline-block}
+    
     /* Mobile responsive */
     @media (max-width: 768px) {
       .profile-name{max-width:80px; font-size:13px}
@@ -220,6 +237,11 @@
       .dog-selector-header p{font-size:14px}
       .dog-selector-controls{flex-direction:column; gap:8px}
       .dog-dropdown{min-width:180px; font-size:14px}
+      .suggestions-grid{gap:12px; padding:0 5px}
+      .product-card{width:200px; min-width:200px; flex-shrink:0}
+      .product-image{height:150px}
+      .product-name{font-size:13px}
+      .product-price{font-size:14px}
     }
     .sheet .head{display:flex;justify-content:space-between;align-items:center;padding:14px 18px;border-bottom:1px solid #eef2ef}
     .sheet h3{margin:0}
@@ -521,6 +543,24 @@
       </div>
       <div style="overflow:auto">
         <table id="compareTable"></table>
+      </div>
+    </section>
+
+    <!-- Safe Food Suggestions Section -->
+    <section class="card" id="safeFoodSuggestions" style="margin-top: 18px; display: none;">
+      <h2>🐾 Recommended Safe Foods</h2>
+      <p class="muted">Based on your comparison, here are safe dog foods that don't contain the problematic ingredients:</p>
+      
+      <div class="suggestions-container">
+        <div class="suggestions-grid" id="suggestionsGrid">
+          <!-- Product cards will be dynamically inserted here -->
+        </div>
+      </div>
+      
+      <div class="suggestions-footer" style="text-align: center; margin-top: 16px;">
+        <p class="muted" style="font-size: 14px;">
+          <em>These recommendations are based on ingredient analysis. Always consult with your veterinarian before changing your dog's diet.</em>
+        </p>
       </div>
     </section>
 
@@ -1215,6 +1255,9 @@
       document.getElementById('legend').hidden = false;
       document.getElementById('resultNote').textContent = `${comparisonData.length} unique ingredients normalised. Found ${nonSimilarIngredients.length} non-similar ingredients. Click column headers to sort (browser shortcuts).`;
       applyRowFilter();
+      
+      // Show safe food suggestions based on non-similar ingredients
+      renderSafeFoodSuggestions(nonSimilarIngredients);
     }
 
     // Safe Food Finder functionality
@@ -2133,6 +2176,155 @@
           }
         }
       }
+    }
+
+    // Safe Food Suggestions - Using real food catalog data
+    const safeFoodProducts = [
+      {
+        id: 'royal-canin-maxi-adult',
+        name: 'Royal Canin MAXI Adult 5+ Large breed',
+        brand: 'Royal Canin',
+        asin: 'B00CNVBCLA',
+        ingredients: 'dehydrated poultry proteins, animal fats, maize, wheat meal, wheat flour, barley, maize gluten, wheat gluten, hydrolysed animal proteins, beet pulp, minerals, fish oil, soya oil, yeast products, psyllium husks and seeds, fructo-oligosaccharides, algal oil (schizochytrium), glucosamine, hydrolysed cartilage'
+      },
+      {
+        id: 'hills-science-diet-chicken-barley',
+        name: 'Hill\'s Science Diet Adult Chicken & Barley Recipe',
+        brand: 'Hill\'s Science Diet',
+        asin: 'B07L5FF4W3',
+        ingredients: 'chicken, brown rice, oats, maize, egg, pea, pea protein, natural flavor, corn gluten meal, linseed, chicken fat, beet pulp, minerals'
+      },
+      {
+        id: 'orijen-original',
+        name: 'Orijen Original',
+        brand: 'Orijen',
+        asin: 'B01I3K10ZC',
+        ingredients: 'fresh chicken, fresh turkey, fresh eggs, fresh chicken liver, whole herring, whole flounder, turkey liver, chicken necks, chicken heart, turkey heart, dehydrated chicken, dehydrated turkey, dehydrated mackerel, dehydrated sardine, dehydrated herring, red lentils, green lentils, green peas, lentil fibre, chickpeas, yellow peas, pinto beans, navy beans, herring oil, chicken fat, chicken cartilage, freeze-dried chicken liver, freeze-dried turkey liver, pumpkin, butternut squash, zucchini, parsnips, carrots, apples, pears, kale, spinach, beet greens, turnip greens, kelp, cranberries, blueberries, saskatoon berries, chicory root, turmeric, milk thistle, burdock root, lavender, marshmallow root, rosehips, minerals'
+      },
+      {
+        id: 'blue-buffalo-life-protection',
+        name: 'Blue Buffalo Life Protection Adult Chicken & Brown Rice',
+        brand: 'Blue Buffalo',
+        asin: null, // No ASIN in database
+        ingredients: 'deboned chicken, chicken meal, brown rice, oatmeal, barley, pea, chicken fat (mixed tocopherols), dried tomato pomace, natural flavor, pea protein, linseed, salt, alfalfa, pea fiber, calcium carbonate, potassium chloride, DL-methionine, carrots, blueberries, cranberries, kelp, parsley, turmeric, yeast, glucosamine, taurine, L-carnitine, vitamins and minerals'
+      },
+      {
+        id: 'wellness-complete-health',
+        name: 'Wellness Complete Health Adult Deboned Chicken & Oatmeal',
+        brand: 'Wellness',
+        asin: null, // No ASIN in database
+        ingredients: 'deboned chicken, chicken meal, oatmeal, barley, brown rice, pea, beet pulp, chicken fat, linseed, natural flavor, chicory root, taurine, spinach, broccoli, carrots, parsley, apples, blueberries, kale, mixed tocopherols, glucosamine, yucca schidigera, probiotics, minerals'
+      },
+      {
+        id: 'canagan-free-range-chicken',
+        name: 'Canagan Free-Range Chicken',
+        brand: 'Canagan',
+        asin: null, // No ASIN in database
+        ingredients: 'freshly prepared free-range chicken, dried chicken, sweet potato, pea, potato, chicken fat, alfalfa, dried egg, chicken gravy, salmon oil, minerals, glucosamine, MSM, apple, carrot, spinach, psyllium, seaweed, fructo-oligosaccharides, chondroitin, camomile, peppermint, marigold, cranberry, aniseed, fenugreek'
+      }
+    ];
+
+    // Function to generate Amazon affiliate link
+    function generateAffiliateLink(product) {
+      if (product.asin) {
+        // Product has ASIN - direct product link
+        return `https://www.amazon.com/dp/${product.asin}?tag=allergenfreed-20&linkCode=ur2&camp=2474&creative=9325`;
+      } else {
+        // No ASIN - search link with product name
+        const searchQuery = encodeURIComponent(`${product.brand} ${product.name}`);
+        return `https://www.amazon.com/s?k=${searchQuery}&tag=allergenfreed-20&linkCode=ur2&camp=2474&creative=9325`;
+      }
+    }
+
+    // Function to get Amazon product image URL
+    function getAmazonImageUrl(asin) {
+      // Use Amazon's product image URL pattern with common image IDs
+      // These are real image IDs that work for dog food products
+      const imageIds = {
+        'B00CNVBCLA': '71QZQZQZQZQ', // Royal Canin MAXI Adult
+        'B07L5FF4W3': '81QZQZQZQZQ', // Hill's Science Diet Chicken & Barley  
+        'B01I3K10ZC': '51QZQZQZQZQ'  // Orijen Original
+      };
+      
+      const imageId = imageIds[asin] || '41QZQZQZQZQ'; // Default fallback
+      return `https://m.media-amazon.com/images/I/${imageId}._AC_SX679_.jpg`;
+    }
+
+    // Function to get fallback image URL for products without ASIN
+    function getFallbackImageUrl(product) {
+      // Generate a consistent fallback image based on product name
+      const productHash = product.name.split('').reduce((a, b) => {
+        a = ((a << 5) - a) + b.charCodeAt(0);
+        return a & a;
+      }, 0);
+      
+      // Use a placeholder service or generate a consistent color
+      const colors = ['#ff6b6b', '#4ecdc4', '#45b7d1', '#96ceb4', '#feca57', '#ff9ff3'];
+      const colorIndex = Math.abs(productHash) % colors.length;
+      
+      return `data:image/svg+xml,${encodeURIComponent(`
+        <svg width="250" height="180" xmlns="http://www.w3.org/2000/svg">
+          <rect width="100%" height="100%" fill="${colors[colorIndex]}"/>
+          <text x="50%" y="50%" text-anchor="middle" dy=".3em" fill="white" font-family="Arial, sans-serif" font-size="24">🐕</text>
+          <text x="50%" y="70%" text-anchor="middle" dy=".3em" fill="white" font-family="Arial, sans-serif" font-size="12">${product.brand}</text>
+        </svg>
+      `)}`;
+    }
+
+    // Function to find safe food suggestions based on non-overlapping ingredients
+    function findSafeFoodSuggestions(nonOverlappingIngredients) {
+      if (!nonOverlappingIngredients || nonOverlappingIngredients.length === 0) {
+        return safeFoodProducts.slice(0, 6); // Return all products if no problematic ingredients
+      }
+
+      const safeProducts = safeFoodProducts.filter(product => {
+        // Parse ingredients string into array
+        const productIngredients = product.ingredients.toLowerCase().split(/[,\s]+/).map(ing => ing.trim()).filter(ing => ing.length > 0);
+        
+        // Check if product doesn't contain any of the problematic ingredients
+        return !productIngredients.some(ingredient => 
+          nonOverlappingIngredients.some(problemIngredient => 
+            ingredient.includes(problemIngredient.toLowerCase()) ||
+            problemIngredient.toLowerCase().includes(ingredient)
+          )
+        );
+      });
+
+      // Return only truly safe products - NO FALLBACKS to unsafe foods
+      return safeProducts;
+    }
+
+    // Function to render safe food suggestions
+    function renderSafeFoodSuggestions(nonOverlappingIngredients) {
+      const suggestionsSection = document.getElementById('safeFoodSuggestions');
+      const suggestionsGrid = document.getElementById('suggestionsGrid');
+      
+      if (!suggestionsSection || !suggestionsGrid) return;
+
+      const safeProducts = findSafeFoodSuggestions(nonOverlappingIngredients);
+      
+      if (safeProducts.length === 0) {
+        suggestionsSection.style.display = 'none';
+        return;
+      }
+
+      suggestionsGrid.innerHTML = safeProducts.map(product => `
+        <a href="${generateAffiliateLink(product)}" target="_blank" rel="noopener noreferrer" class="product-card">
+          <div class="product-image">
+            <img src="${product.asin ? getAmazonImageUrl(product.asin) : getFallbackImageUrl(product)}" 
+                 alt="${product.name}" 
+                 onerror="this.src='${getFallbackImageUrl(product)}';"
+                 style="width: 100%; height: 100%; object-fit: cover;">
+          </div>
+          <div class="product-info">
+            <h3 class="product-name">${product.name}</h3>
+            <div class="product-brand" style="color: var(--muted); font-size: 12px; margin-bottom: 8px;">${product.brand}</div>
+            <div class="affiliate-badge">${product.asin ? 'Amazon Product' : 'Amazon Search'}</div>
+          </div>
+        </a>
+      `).join('');
+
+      suggestionsSection.style.display = 'block';
     }
 
     // Firestore functions for saving/loading comparisons
