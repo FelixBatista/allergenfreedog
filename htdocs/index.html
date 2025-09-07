@@ -574,16 +574,13 @@
       <h2>Safe Food Finder</h2>
       <p class="muted">Test a new dog food to see if it contains any ingredients that could cause problems for your dog.</p>
       
-      <div class="row">
-        <div class="field">
-          <label for="newFoodName">Food Name</label>
-          <input type="text" id="newFoodName" placeholder="Enter the name of the food to test">
-        </div>
-        <div class="field">
-          <label for="newFoodIngredients">Ingredients</label>
-          <textarea id="newFoodIngredients" rows="3" placeholder="Paste ingredients separated by commas…"></textarea>
-          <div class="ingredient-suggestions" id="newFoodSuggestions"></div>
-        </div>
+      <div class="foodEntry">
+        <select class="foodSelect" id="newFoodSelect" aria-describedby="safeFoodHelp">
+          <option value="(none)">(none)</option>
+        </select>
+        <small class="muted" id="safeFoodHelp">Pick a sample or "Custom (paste)"</small>
+        <textarea class="foodText" id="newFoodIngredients" rows="3" placeholder="Paste ingredients separated by commas…"></textarea>
+        <div class="ingredient-suggestions" id="newFoodSuggestions"></div>
       </div>
       
       <div class="field" style="text-align:right">
@@ -746,9 +743,35 @@
       setupFoodEntry(document.querySelector('#triggeringFoods .foodEntry'), 'Sample Brand - Insect & Pea');
       setupFoodEntry(document.querySelector('#safeFoods .foodEntry'), '(none)');
       
+      // Set up Safe Food Finder dropdown
+      setupFoodEntry(document.querySelector('#safeFoodFinder .foodEntry'), '(none)');
+      
       // Add event listeners for adding new foods
       document.getElementById('addTriggeringFood').addEventListener('click', () => addNewFood('triggeringFoods'));
       document.getElementById('addSafeFood').addEventListener('click', () => addNewFood('safeFoods'));
+      
+      // Set up Safe Food Finder dropdown change handler
+      document.getElementById('newFoodSelect').addEventListener('change', (e) => {
+        const selectValue = e.target.value;
+        const textarea = document.getElementById('newFoodIngredients');
+        
+        if (selectValue === '(none)') {
+          textarea.value = '';
+          textarea.placeholder = 'Paste ingredients separated by commas…';
+          textarea.disabled = false;
+        } else if (selectValue === 'Custom (paste)') {
+          textarea.value = '';
+          textarea.placeholder = 'Paste ingredients separated by commas…';
+          textarea.disabled = false;
+        } else {
+          // Find the food in the catalog and populate ingredients
+          const food = foodCatalog.find(f => `${f.brand}${f.brand? ' - ':' '}${f.name}`.trim() === selectValue);
+          if (food) {
+            textarea.value = food.ingredients || '';
+            textarea.disabled = false;
+          }
+        }
+      });
       
       // Set up ingredient suggestions for safe food finder
       setupIngredientSuggestions('newFoodIngredients', 'newFoodSuggestions');
@@ -1268,13 +1291,16 @@
 
     // Safe Food Finder functionality
     document.getElementById('testNewFood').addEventListener('click', async () => {
-      const foodName = document.getElementById('newFoodName').value.trim();
+      const selectValue = document.getElementById('newFoodSelect').value;
       const ingredients = document.getElementById('newFoodIngredients').value.trim();
       
-      if (!foodName || !ingredients) {
-        alert('Please enter both food name and ingredients.');
+      if (selectValue === "(none)" || !ingredients) {
+        alert('Please select a food or enter ingredients.');
         return;
       }
+      
+      // Extract food name from select value if it's not custom
+      const foodName = selectValue === 'Custom (paste)' ? 'Custom Food' : selectValue;
       
       if (nonSimilarIngredients.length === 0) {
         alert('Please run a comparison first to identify non-similar ingredients.');
