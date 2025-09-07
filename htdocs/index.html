@@ -463,11 +463,6 @@
 
         <form id="compare" class="form" aria-labelledby="compareHeading">
           <h2 id="compareHeading">Compare Dog Foods</h2>
-          <div class="filters" role="group" aria-label="Filters">
-            <button type="button" class="chip active" data-filter="showAll">Show all</button>
-            <button type="button" class="chip" data-filter="allergens">Allergens only</button>
-            <button type="button" class="chip" data-filter="overlap">Overlaps only</button>
-          </div>
 
           <!-- per-column brand filters moved into each column for scoped filtering -->
 
@@ -545,6 +540,11 @@
         <span class="pill danger">High: gluten/poultry</span>
         <span class="pill warn">Possible: soy/corn/peas/yeast/fish</span>
         <span class="pill ok">Safe (based on filters)</span>
+      </div>
+      <div class="filters" role="group" aria-label="Filters" style="margin-bottom: 16px; display: flex; gap: 8px; justify-content: center;">
+        <button type="button" class="chip active" data-filter="showAll">Show all</button>
+        <button type="button" class="chip" data-filter="allergens">Allergens only</button>
+        <button type="button" class="chip" data-filter="overlap">Overlaps only</button>
       </div>
       <div style="overflow:auto">
         <table id="compareTable"></table>
@@ -1262,7 +1262,7 @@
       applyRowFilter();
       
       // Show safe food suggestions based on non-similar ingredients
-      renderSafeFoodSuggestions(nonSimilarIngredients);
+      renderSafeFoodSuggestions(nonSimilarIngredients, comparisonData);
     }
 
     // Safe Food Finder functionality
@@ -2334,10 +2334,25 @@
       return 'data:image/svg+xml,<svg width="1" height="1" xmlns="http://www.w3.org/2000/svg"></svg>';
     }
 
-    // Function to find safe food suggestions based on non-overlapping ingredients
-    function findSafeFoodSuggestions(nonOverlappingIngredients) {
+    // Function to find safe food suggestions based on problematic non-overlapping ingredients
+    function findSafeFoodSuggestions(nonOverlappingIngredients, comparisonData) {
       if (!nonOverlappingIngredients || nonOverlappingIngredients.length === 0) {
         return safeFoodProducts.slice(0, 6); // Return all products if no problematic ingredients
+      }
+
+      // Filter to only get problematic ingredients (danger and warn risk levels)
+      const problematicIngredients = nonOverlappingIngredients.filter(ingredientName => {
+        // Find the ingredient in comparison data to get its risk level
+        const ingredientData = comparisonData.find(item => item.name === ingredientName);
+        if (!ingredientData) return false;
+        
+        // Only consider ingredients with danger or warn risk levels
+        return ingredientData.risk === 'danger' || ingredientData.risk === 'warn';
+      });
+
+      // If no problematic ingredients, return all products
+      if (problematicIngredients.length === 0) {
+        return safeFoodProducts.slice(0, 6);
       }
 
       const safeProducts = safeFoodProducts.filter(product => {
@@ -2346,7 +2361,7 @@
         
         // Check if product doesn't contain any of the problematic ingredients
         return !productIngredients.some(ingredient => 
-          nonOverlappingIngredients.some(problemIngredient => 
+          problematicIngredients.some(problemIngredient => 
             ingredient.includes(problemIngredient.toLowerCase()) ||
             problemIngredient.toLowerCase().includes(ingredient)
           )
@@ -2358,13 +2373,13 @@
     }
 
     // Function to render safe food suggestions
-    function renderSafeFoodSuggestions(nonOverlappingIngredients) {
+    function renderSafeFoodSuggestions(nonOverlappingIngredients, comparisonData) {
       const suggestionsSection = document.getElementById('safeFoodSuggestions');
       const suggestionsGrid = document.getElementById('suggestionsGrid');
       
       if (!suggestionsSection || !suggestionsGrid) return;
 
-      const safeProducts = findSafeFoodSuggestions(nonOverlappingIngredients);
+      const safeProducts = findSafeFoodSuggestions(nonOverlappingIngredients, comparisonData);
       
       if (safeProducts.length === 0) {
         suggestionsSection.style.display = 'none';
