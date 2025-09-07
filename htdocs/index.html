@@ -177,6 +177,50 @@
     .modal-body{padding:24px}
     #loginBtn:hover{background:#3367d6 !important; transform:translateY(-1px); box-shadow:0 4px 12px rgba(66,133,244,0.3)}
     #firebaseGoogleSignIn:hover{box-shadow:0 2px 8px rgba(0,0,0,0.15); transform:translateY(-1px); border-color:#4285f4}
+    
+    /* User Profile Styles */
+    .user-profile{position:relative; display:flex; align-items:center; gap:12px; cursor:pointer; padding:8px 12px; border-radius:12px; transition:all 0.2s; background:rgba(255,255,255,0.1); backdrop-filter:blur(10px)}
+    .user-profile:hover{background:rgba(255,255,255,0.2); transform:translateY(-1px)}
+    .profile-avatar{position:relative; width:40px; height:40px; border-radius:50%; border:2px solid var(--primary); overflow:hidden; flex-shrink:0}
+    .profile-avatar img{width:100%; height:100%; object-fit:cover}
+    .profile-initials{width:100%; height:100%; display:flex; align-items:center; justify-content:center; background:linear-gradient(135deg, var(--primary), var(--accent)); color:white; font-weight:600; font-size:16px; text-transform:uppercase}
+    .profile-name{color:var(--ink); font-weight:500; font-size:14px; max-width:120px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; flex-shrink:1}
+    .profile-dropdown{position:absolute; top:100%; right:0; background:var(--card); border-radius:12px; box-shadow:var(--shadow); padding:8px; min-width:120px; opacity:0; visibility:hidden; transform:translateY(-10px); transition:all 0.2s; z-index:1000; border:1px solid #e9e1d7}
+    .profile-dropdown .btn{width:100%; justify-content:flex-start; margin:0; padding:8px 12px; font-size:14px}
+    .profile-dropdown .btn:hover{background:var(--primary); color:white}
+    
+    /* Dog Selector Section Styles */
+    .dog-selector-section{background:linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%); padding:24px 0; border-bottom:1px solid #e9e1d7}
+    .dog-selector-card{background:white; border-radius:16px; padding:24px; box-shadow:0 4px 12px rgba(0,0,0,0.1); border:1px solid #e9e1d7; text-align:center}
+    .dog-selector-header{margin-bottom:20px}
+    .dog-selector-header h2{margin:0 0 8px 0; color:var(--ink); font-size:24px; font-weight:600}
+    .dog-selector-header p{margin:0; color:var(--muted); font-size:16px}
+    .dog-selector-controls{display:flex; gap:12px; justify-content:center; align-items:center; flex-wrap:wrap}
+    .dog-dropdown{padding:12px 16px; border:2px solid #e9e1d7; border-radius:12px; background:white; color:var(--ink); font-size:16px; min-width:200px; cursor:pointer; transition:all 0.2s}
+    .dog-dropdown:focus{outline:none; border-color:var(--primary); box-shadow:0 0 0 3px rgba(121,201,158,0.2)}
+    .dog-dropdown:hover{border-color:var(--primary)}
+    
+    /* Current Dog Indicator */
+    .current-dog-indicator{background:linear-gradient(135deg, #e8f5e8 0%, #f0f8f0 100%); border:2px solid var(--primary); border-radius:12px; padding:12px 16px; margin:16px 0; display:flex; align-items:center; gap:8px; animation:slideIn 0.3s ease-out}
+    .indicator-icon{font-size:20px}
+    .indicator-text{color:var(--ink); font-size:14px; font-weight:500}
+    .indicator-text strong{color:var(--primary)}
+    
+    @keyframes slideIn{from{opacity:0; transform:translateY(-10px)} to{opacity:1; transform:translateY(0)}}
+    
+    /* Mobile responsive */
+    @media (max-width: 768px) {
+      .profile-name{max-width:80px; font-size:13px}
+      .user-profile{padding:6px 8px; gap:8px}
+      .profile-avatar{width:32px; height:32px}
+      .profile-initials{font-size:14px}
+      .dog-selector-section{padding:16px 0}
+      .dog-selector-card{padding:16px}
+      .dog-selector-header h2{font-size:20px}
+      .dog-selector-header p{font-size:14px}
+      .dog-selector-controls{flex-direction:column; gap:8px}
+      .dog-dropdown{min-width:180px; font-size:14px}
+    }
     .sheet .head{display:flex;justify-content:space-between;align-items:center;padding:14px 18px;border-bottom:1px solid #eef2ef}
     .sheet h3{margin:0}
     .sheet .body{padding:12px 18px 22px}
@@ -247,13 +291,39 @@
         <a class="btn ghost" href="allergy-testing.html">Allergy Testing Guide</a>
         <button class="btn" id="loginBtn" style="display: none; background: #4285f4; color: white; border: none;">Log In</button>
         <div id="userInfo" style="display: none;">
-          <span id="userName"></span>
-          <button class="btn ghost" id="logoutBtn">Log Out</button>
+          <div id="userProfile" class="user-profile">
+            <div class="profile-avatar">
+              <img id="userAvatar" src="" alt="Profile" style="display: none;">
+              <div id="userInitials" class="profile-initials"></div>
+            </div>
+            <span id="userName" class="profile-name"></span>
+            <div class="profile-dropdown">
+              <button class="btn ghost" id="logoutBtn">Log Out</button>
+            </div>
+          </div>
         </div>
         <a class="btn primary" href="#compare">Compare Now</a>
       </div>
     </div>
   </header>
+
+  <!-- Dog Selector Section -->
+  <div id="dogSelectorSection" class="dog-selector-section" style="display: none;">
+    <div class="container">
+      <div class="dog-selector-card">
+        <div class="dog-selector-header">
+          <h2>🐾 Working with <span id="currentDogName">your dog</span></h2>
+          <p>All comparisons below will be saved for this dog</p>
+        </div>
+        <div class="dog-selector-controls">
+          <select id="dogSelectDropdown" class="dog-dropdown">
+            <option value="">Select a dog...</option>
+          </select>
+          <button id="addNewDog" class="btn primary">+ Add New Dog</button>
+        </div>
+      </div>
+    </div>
+  </div>
 
   <!-- Direct Login Dialog Modal -->
   <div id="loginDialog" class="modal" style="display: none;">
@@ -299,19 +369,69 @@
     </div>
   </div>
 
+  <!-- Welcome Dialog Modal -->
+  <div id="welcomeDialog" class="modal" style="display: none;">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>Welcome to Allergy Free Dog! 🐾</h2>
+        <button class="modal-close" id="closeWelcomeDialog">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div style="text-align: center; margin-bottom: 24px;">
+          <div style="font-size: 48px; margin-bottom: 16px;">🎉</div>
+          <p style="font-size: 18px; color: var(--ink); margin-bottom: 16px;">
+            You're now signed in! Let's get started by creating a profile for your dog.
+          </p>
+        </div>
+        
+        <div style="background: #f8f9fa; padding: 20px; border-radius: 12px; margin-bottom: 24px;">
+          <h3 style="margin: 0 0 12px 0; color: var(--ink);">What you can do now:</h3>
+          <ul style="margin: 0; padding-left: 20px; color: var(--muted);">
+            <li>Create profiles for each of your dogs</li>
+            <li>Save food comparisons for each dog</li>
+            <li>Track which foods work best for each dog</li>
+            <li>Load previous comparisons instantly</li>
+          </ul>
+        </div>
+
+        <div style="margin-bottom: 20px;">
+          <label for="firstDogName" style="display: block; margin-bottom: 8px; font-weight: 500; color: var(--ink);">
+            What's your dog's name?
+          </label>
+          <input 
+            type="text" 
+            id="firstDogName" 
+            placeholder="Enter your dog's name..." 
+            style="width: 100%; padding: 12px; border: 2px solid #e9e1d7; border-radius: 8px; font-size: 16px;"
+            maxlength="50"
+          >
+        </div>
+
+        <div style="display: flex; gap: 12px; justify-content: flex-end;">
+          <button id="skipWelcome" class="btn ghost">Skip for now</button>
+          <button id="createFirstDogFromWelcome" class="btn primary">Create Dog Profile</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <!-- auth panel removed; login handled via dialog (not inlined) -->
 
 <!-- dog panel removed; dog management via login dialog and Firestore flow -->
 
   <div id="noDogsMessage" class="container card" style="margin:12px 0; display:none;">
     <p>No dogs found for your account. Create a dog to start saving comparisons and getting suggestions.</p>
-    <button id="createDemoDog" class="btn primary">Create a demo dog</button>
+    <button id="createFirstDog" class="btn primary">Create Your First Dog</button>
   </div>
 
   <main class="container hero">
     <div class="grid">
       <section class="card">
         <h1><span class="tag">Compare dog foods</span> and spot allergens instantly 🐾</h1>
+        <div id="currentDogIndicator" class="current-dog-indicator" style="display: none;">
+          <span class="indicator-icon">🐕</span>
+          <span class="indicator-text">Showing data for <strong id="indicatorDogName">your dog</strong></span>
+        </div>
         <p class="lede">Paste labels or pick built‑ins. We normalise ingredients and highlight <strong>gluten</strong>, <strong>poultry</strong>, common <strong>allergens</strong>, and <strong>overlaps</strong>. Fully client‑side — just upload this file to your InfinityFree hosting.</p>
 
         <form id="compare" class="form" aria-labelledby="compareHeading">
@@ -1015,12 +1135,46 @@
   lastComparison = { comparisonData: result.data.comparisonTable, triggering, safe };
   // Persist to Firestore if available (Firebase Option B)
   if (typeof saveComparisonToFirestore === 'function' && currentDogId) {
+    const saveBtn = document.getElementById('saveComparisonBtn');
+    const originalSaveText = saveBtn.textContent;
+    
+    // Show saving feedback
+    saveBtn.textContent = '💾 Saving...';
+    saveBtn.disabled = true;
+    
     saveComparisonToFirestore(currentDogId, {
       triggering,
       safe,
       comparisonTable: result.data.comparisonTable,
       timestamp: Date.now()
-    }).catch(() => {});
+    }).then(() => {
+      // Show success feedback
+      saveBtn.textContent = '✅ Saved!';
+      saveBtn.style.background = 'var(--primary)';
+      saveBtn.style.color = 'white';
+      
+      // Reset after 2 seconds
+      setTimeout(() => {
+        saveBtn.textContent = originalSaveText;
+        saveBtn.style.background = '';
+        saveBtn.style.color = '';
+        saveBtn.disabled = false;
+      }, 2000);
+    }).catch((error) => {
+      console.error('Save error:', error);
+      // Show error feedback
+      saveBtn.textContent = '❌ Save Failed';
+      saveBtn.style.background = '#dc3545';
+      saveBtn.style.color = 'white';
+      
+      // Reset after 3 seconds
+      setTimeout(() => {
+        saveBtn.textContent = originalSaveText;
+        saveBtn.style.background = '';
+        saveBtn.style.color = '';
+        saveBtn.disabled = false;
+      }, 3000);
+    });
   }
 
   // Build and display comparison table
@@ -1330,6 +1484,18 @@
         }
       });
 
+      // Handle redirect result (for when popup is blocked)
+      auth.getRedirectResult().then((result) => {
+        if (result.credential) {
+          console.log('Redirect sign-in successful:', result);
+          // Close both dialogs
+          document.getElementById('loginDialog').style.display = 'none';
+          document.getElementById('saveComparisonDialog').style.display = 'none';
+        }
+      }).catch((error) => {
+        console.error('Redirect sign-in error:', error);
+      });
+
       // Initialize UI event listeners
       initializeAuthUI();
     })();
@@ -1339,27 +1505,54 @@
       const loginBtn = document.getElementById('loginBtn');
       const userInfo = document.getElementById('userInfo');
       const userName = document.getElementById('userName');
+      const userAvatar = document.getElementById('userAvatar');
+      const userInitials = document.getElementById('userInitials');
       const noDogsMessage = document.getElementById('noDogsMessage');
       const dogManagement = document.getElementById('dogManagement');
+      const dogSelectorSection = document.getElementById('dogSelectorSection');
 
       if (isLoggedIn) {
         loginBtn.style.display = 'none';
         userInfo.style.display = 'flex';
-        userName.textContent = gisUser.name;
+        
+        // Update user name with proper truncation
+        const displayName = gisUser.name || 'User';
+        userName.textContent = displayName;
+        
+        // Handle profile picture or initials
+        if (gisUser.avatar) {
+          userAvatar.src = gisUser.avatar;
+          userAvatar.style.display = 'block';
+          userInitials.style.display = 'none';
+        } else {
+          userAvatar.style.display = 'none';
+          userInitials.style.display = 'flex';
+          // Generate initials from name
+          const initials = displayName.split(' ').map(n => n[0]).join('').substring(0, 2);
+          userInitials.textContent = initials;
+        }
         
         if (userDogs.length === 0) {
           noDogsMessage.style.display = 'block';
           dogManagement.style.display = 'none';
+          dogSelectorSection.style.display = 'none';
+          document.getElementById('currentDogIndicator').style.display = 'none';
+          // Show welcome dialog for first-time users
+          showWelcomeDialog();
         } else {
           noDogsMessage.style.display = 'none';
           dogManagement.style.display = 'block';
-          renderDogList();
+          dogSelectorSection.style.display = 'block';
+          document.getElementById('currentDogIndicator').style.display = 'flex';
+          renderDogSelector();
         }
       } else {
         loginBtn.style.display = 'inline-block';
         userInfo.style.display = 'none';
         noDogsMessage.style.display = 'none';
         dogManagement.style.display = 'none';
+        dogSelectorSection.style.display = 'none';
+        document.getElementById('currentDogIndicator').style.display = 'none';
       }
     }
 
@@ -1375,6 +1568,31 @@
         auth.signOut();
       });
 
+      // Profile click handler to toggle dropdown
+      document.addEventListener('click', (e) => {
+        const userProfile = document.getElementById('userProfile');
+        const profileDropdown = document.querySelector('.profile-dropdown');
+        
+        if (userProfile && userProfile.contains(e.target)) {
+          // Clicked on profile, toggle dropdown
+          const isVisible = profileDropdown.style.opacity === '1';
+          if (isVisible) {
+            profileDropdown.style.opacity = '0';
+            profileDropdown.style.visibility = 'hidden';
+            profileDropdown.style.transform = 'translateY(-10px)';
+          } else {
+            profileDropdown.style.opacity = '1';
+            profileDropdown.style.visibility = 'visible';
+            profileDropdown.style.transform = 'translateY(0)';
+          }
+        } else if (userProfile && !userProfile.contains(e.target)) {
+          // Clicked outside, close dropdown
+          profileDropdown.style.opacity = '0';
+          profileDropdown.style.visibility = 'hidden';
+          profileDropdown.style.transform = 'translateY(-10px)';
+        }
+      });
+
       // Close dialogs
       document.getElementById('closeLoginDialog').addEventListener('click', () => {
         document.getElementById('loginDialog').style.display = 'none';
@@ -1384,13 +1602,46 @@
         document.getElementById('saveComparisonDialog').style.display = 'none';
       });
 
+      document.getElementById('closeWelcomeDialog').addEventListener('click', () => {
+        document.getElementById('welcomeDialog').style.display = 'none';
+      });
+
       // Add dog button
       document.getElementById('addDogBtn').addEventListener('click', addDog);
 
-      // Create demo dog button
-      document.getElementById('createDemoDog').addEventListener('click', () => {
-        document.getElementById('newDogName').value = 'Demo Dog';
-        addDog();
+      // Create first dog button
+      document.getElementById('createFirstDog').addEventListener('click', () => {
+        showWelcomeDialog();
+      });
+
+      // Welcome dialog buttons
+      document.getElementById('createFirstDogFromWelcome').addEventListener('click', createFirstDogFromWelcome);
+      document.getElementById('skipWelcome').addEventListener('click', () => {
+        document.getElementById('welcomeDialog').style.display = 'none';
+      });
+
+      // Add new dog button
+      document.getElementById('addNewDog').addEventListener('click', () => {
+        showAddDogDialog();
+      });
+
+      // Dog selector dropdown
+      document.getElementById('dogSelectDropdown').addEventListener('change', async (e) => {
+        if (e.target.value) {
+          currentDogId = e.target.value;
+          
+          // Show loading feedback
+          showDogLoadingFeedback();
+          
+          // Update the dog name display immediately
+          renderDogSelector();
+          
+          // Load the comparison
+          await loadLastComparison(currentDogId);
+          
+          // Show success feedback
+          showDogLoadedFeedback();
+        }
       });
 
       // Close dialogs when clicking outside
@@ -1403,6 +1654,12 @@
       document.getElementById('saveComparisonDialog').addEventListener('click', (e) => {
         if (e.target.id === 'saveComparisonDialog') {
           document.getElementById('saveComparisonDialog').style.display = 'none';
+        }
+      });
+
+      document.getElementById('welcomeDialog').addEventListener('click', (e) => {
+        if (e.target.id === 'welcomeDialog') {
+          document.getElementById('welcomeDialog').style.display = 'none';
         }
       });
 
@@ -1449,6 +1706,7 @@
         provider.addScope('email');
         provider.addScope('profile');
         
+        // Try popup first, fallback to redirect if blocked
         auth.signInWithPopup(provider).then((result) => {
           console.log('Sign-in successful:', result);
           // Close both dialogs
@@ -1459,12 +1717,17 @@
           console.error('Error code:', error.code);
           console.error('Error message:', error.message);
           
+          // If popup is blocked, try redirect
+          if (error.code === 'auth/popup-blocked') {
+            console.log('Popup blocked, trying redirect...');
+            auth.signInWithRedirect(provider);
+            return;
+          }
+          
           // More specific error messages
           let errorMessage = 'Sign-in failed. Please try again.';
           if (error.code === 'auth/popup-closed-by-user') {
             errorMessage = 'Sign-in was cancelled. Please try again.';
-          } else if (error.code === 'auth/popup-blocked') {
-            errorMessage = 'Popup was blocked by browser. Please allow popups and try again.';
           } else if (error.code === 'auth/unauthorized-domain') {
             errorMessage = 'Domain not authorized. Please check Firebase configuration.';
           } else if (error.code === 'auth/operation-not-allowed') {
@@ -1513,31 +1776,52 @@
       }
     }
 
-    function renderDogList() {
-      const dogList = document.getElementById('dogList');
-      dogList.innerHTML = userDogs.map(dog => 
-        `<div class="dog-item" style="padding: 8px; border: 1px solid #e9e1d7; margin: 4px 0; border-radius: 8px; cursor: pointer; ${dog.id === currentDogId ? 'background: var(--primary); color: white;' : ''}" data-dog-id="${dog.id}">
-          ${dog.name}
-        </div>`
-      ).join('');
-
-      // Add click listeners
-      dogList.querySelectorAll('.dog-item').forEach(item => {
-        item.addEventListener('click', async () => {
-          currentDogId = item.dataset.dogId;
-          renderDogList(); // Re-render to update selection
-          await loadLastComparison(currentDogId);
-        });
-      });
+    function renderDogSelector() {
+      const dogSelectDropdown = document.getElementById('dogSelectDropdown');
+      const currentDogName = document.getElementById('currentDogName');
+      const indicatorDogName = document.getElementById('indicatorDogName');
+      
+      dogSelectDropdown.innerHTML = '<option value="">Select a dog...</option>' + 
+        userDogs.map(dog => `<option value="${dog.id}" ${dog.id === currentDogId ? 'selected' : ''}>${dog.name}</option>`).join('');
+      
+      // Update the current dog name display
+      if (currentDogId) {
+        const currentDog = userDogs.find(dog => dog.id === currentDogId);
+        if (currentDog) {
+          currentDogName.textContent = currentDog.name;
+          indicatorDogName.textContent = currentDog.name;
+        }
+      } else {
+        currentDogName.textContent = 'your dog';
+        indicatorDogName.textContent = 'your dog';
+      }
     }
 
-    async function addDog() {
-      const dogName = document.getElementById('newDogName').value.trim();
+    function showWelcomeDialog() {
+      document.getElementById('welcomeDialog').style.display = 'flex';
+      document.getElementById('firstDogName').focus();
+    }
+
+    function showAddDogDialog() {
+      const dogName = prompt('Enter your dog\'s name:');
+      if (dogName && dogName.trim()) {
+        createDog(dogName.trim());
+      }
+    }
+
+    async function createFirstDogFromWelcome() {
+      const dogName = document.getElementById('firstDogName').value.trim();
       if (!dogName) {
         alert('Please enter a dog name');
         return;
       }
+      
+      await createDog(dogName);
+      document.getElementById('welcomeDialog').style.display = 'none';
+      document.getElementById('firstDogName').value = '';
+    }
 
+    async function createDog(dogName) {
       if (!auth.currentUser) {
         alert('Please sign in first');
         return;
@@ -1553,13 +1837,61 @@
         userDogs.push({ id: docRef.id, ...dogData });
         currentDogId = docRef.id;
         
-        document.getElementById('newDogName').value = '';
         updateAuthUI(true);
-        showSuccess('Dog added successfully!');
+        showSuccess('Dog profile created successfully!');
       } catch (error) {
         console.error('Error adding dog:', error);
         showError('Failed to add dog. Please try again.');
       }
+    }
+
+    function showDogLoadingFeedback() {
+      const dogSelectorCard = document.querySelector('.dog-selector-card');
+      const currentDogName = document.getElementById('currentDogName');
+      
+      // Add loading animation
+      dogSelectorCard.style.opacity = '0.7';
+      dogSelectorCard.style.transform = 'scale(0.98)';
+      currentDogName.innerHTML = '<span style="display: inline-block; animation: pulse 1s infinite;">⏳</span> Loading...';
+      
+      // Add pulse animation
+      const style = document.createElement('style');
+      style.textContent = `
+        @keyframes pulse {
+          0%, 100% { opacity: 1; }
+          50% { opacity: 0.5; }
+        }
+      `;
+      document.head.appendChild(style);
+    }
+
+    function showDogLoadedFeedback() {
+      const dogSelectorCard = document.querySelector('.dog-selector-card');
+      const currentDogName = document.getElementById('currentDogName');
+      
+      // Remove loading state
+      dogSelectorCard.style.opacity = '1';
+      dogSelectorCard.style.transform = 'scale(1)';
+      
+      // Show success feedback
+      const originalName = currentDogName.textContent;
+      currentDogName.innerHTML = '<span style="color: var(--primary);">✅</span> ' + originalName;
+      
+      // Reset after 2 seconds
+      setTimeout(() => {
+        currentDogName.textContent = originalName;
+      }, 2000);
+    }
+
+    async function addDog() {
+      const dogName = document.getElementById('newDogName').value.trim();
+      if (!dogName) {
+        alert('Please enter a dog name');
+        return;
+      }
+
+      await createDog(dogName);
+      document.getElementById('newDogName').value = '';
     }
 
     async function loadLastComparison(dogId) {
@@ -1574,16 +1906,107 @@
           const comparison = comparisonsSnapshot.docs[0].data();
           // Render the comparison in the UI
           renderComparison(comparison);
+          
+          // Show success feedback in the indicator
+          const indicatorDogName = document.getElementById('indicatorDogName');
+          const originalText = indicatorDogName.textContent;
+          indicatorDogName.innerHTML = '<span style="color: var(--primary);">✅</span> ' + originalText;
+          
+          setTimeout(() => {
+            indicatorDogName.textContent = originalText;
+          }, 2000);
+        } else {
+          // Show no data message in the indicator
+          const indicatorDogName = document.getElementById('indicatorDogName');
+          const originalText = indicatorDogName.textContent;
+          indicatorDogName.innerHTML = '<span style="color: var(--muted);">📝</span> ' + originalText + ' (no saved data)';
+          
+          setTimeout(() => {
+            indicatorDogName.textContent = originalText;
+          }, 3000);
         }
       } catch (error) {
         console.error('Error loading last comparison:', error);
+        showError('Failed to load comparison. Please try again.');
       }
     }
 
     function renderComparison(comparison) {
-      // This would integrate with your existing comparison rendering logic
       console.log('Loading comparison:', comparison);
-      // You can implement the specific rendering logic here based on your existing code
+      
+      // Populate the form fields with the saved comparison data
+      if (comparison.triggering && comparison.triggering.length > 0) {
+        // Clear existing triggering foods
+        const triggeringContainer = document.getElementById('triggeringFoods');
+        if (triggeringContainer) {
+          // Remove all existing food entries except the first one
+          const existingEntries = triggeringContainer.querySelectorAll('.foodEntry:not(:first-child)');
+          existingEntries.forEach(entry => entry.remove());
+          
+          // Populate the first entry
+          const firstEntry = triggeringContainer.querySelector('.foodEntry:first-child');
+          if (firstEntry) {
+            const foodSelect = firstEntry.querySelector('select');
+            const ingredientsTextarea = firstEntry.querySelector('textarea');
+            
+            if (foodSelect && ingredientsTextarea) {
+              // Set the food selection
+              foodSelect.value = comparison.triggering[0].name || '';
+              ingredientsTextarea.value = comparison.triggering[0].ingredients || '';
+            }
+          }
+          
+          // Add additional triggering foods if there are more
+          for (let i = 1; i < comparison.triggering.length; i++) {
+            addNewFood('triggeringFoods');
+            const newEntry = triggeringContainer.querySelector('.foodEntry:last-child');
+            if (newEntry) {
+              const foodSelect = newEntry.querySelector('select');
+              const ingredientsTextarea = newEntry.querySelector('textarea');
+              if (foodSelect && ingredientsTextarea) {
+                foodSelect.value = comparison.triggering[i].name || '';
+                ingredientsTextarea.value = comparison.triggering[i].ingredients || '';
+              }
+            }
+          }
+        }
+      }
+      
+      if (comparison.safe && comparison.safe.length > 0) {
+        // Clear existing safe foods
+        const safeContainer = document.getElementById('safeFoods');
+        if (safeContainer) {
+          // Remove all existing food entries except the first one
+          const existingEntries = safeContainer.querySelectorAll('.foodEntry:not(:first-child)');
+          existingEntries.forEach(entry => entry.remove());
+          
+          // Populate the first entry
+          const firstEntry = safeContainer.querySelector('.foodEntry:first-child');
+          if (firstEntry) {
+            const foodSelect = firstEntry.querySelector('select');
+            const ingredientsTextarea = firstEntry.querySelector('textarea');
+            
+            if (foodSelect && ingredientsTextarea) {
+              foodSelect.value = comparison.safe[0].name || '';
+              ingredientsTextarea.value = comparison.safe[0].ingredients || '';
+            }
+          }
+          
+          // Add additional safe foods if there are more
+          for (let i = 1; i < comparison.safe.length; i++) {
+            addNewFood('safeFoods');
+            const newEntry = safeContainer.querySelector('.foodEntry:last-child');
+            if (newEntry) {
+              const foodSelect = newEntry.querySelector('select');
+              const ingredientsTextarea = newEntry.querySelector('textarea');
+              if (foodSelect && ingredientsTextarea) {
+                foodSelect.value = comparison.safe[i].name || '';
+                ingredientsTextarea.value = comparison.safe[i].ingredients || '';
+              }
+            }
+          }
+        }
+      }
     }
 
     // Firestore functions for saving/loading comparisons
