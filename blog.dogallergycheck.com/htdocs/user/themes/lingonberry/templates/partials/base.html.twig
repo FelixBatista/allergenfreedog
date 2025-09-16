@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="{{ grav.language.getActive ?: grav.config.site.default_lang }}">
+<head>
+    {% block head %}
+      <meta charset="utf-8" />
+      <title>{% if header.title %}{{ header.title }} | {% endif %}{{ site.title }}</title>
+      {% include 'partials/metadata.html.twig' %}
+      <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no">
+      <link rel="icon" type="image/svg+xml" href="{{ theme_url }}/images/favicon.svg" />
+
+      <!-- Google Fonts -->
+      <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+      
+      <!-- AOS Animation Library -->
+      <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+      
+      <!-- Feather Icons -->
+      <script src="https://unpkg.com/feather-icons"></script>
+
+      {% block stylesheets %}
+          {% do assets.addCss('theme://css/custom.css') %}
+      {% endblock %}
+
+      {% block javascripts %}
+          {% do assets.add('jquery',101) %}
+      {% endblock %}
+
+      {% block assets deferred %}
+        {{ assets.css()|raw }}
+        {{ assets.js()|raw }}
+      {% endblock %}
+
+    {% endblock head %}
+</head>
+<body class="{{ page.header.body_classes }}">
+  {% block navigation %}
+      {% include 'partials/navigation.html.twig' %}
+  {% endblock %}
+
+  {% block content %}{% endblock %}
+
+  {% block footer %}
+  {% include 'partials/footer.html.twig' %}
+  {% endblock %}
+
+  <!-- AOS Animation Script -->
+  <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+  <script>
+    AOS.init({
+      duration: 800,
+      easing: 'ease-in-out',
+      once: true
+    });
+  </script>
+  
+  <!-- Feather Icons -->
+  <script>feather.replace();</script>
+
+  {% block bottom %}
+      {{ assets.js('bottom')|raw }}
+  {% endblock %}
+</body>
+</html>
