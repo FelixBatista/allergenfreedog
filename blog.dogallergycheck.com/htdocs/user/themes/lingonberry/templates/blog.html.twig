@@ -12,17 +12,8 @@
     {% endif  %}
 
     {% block content %}
-    <!-- Hero Section -->
-    <header class="hero">
-        <div class="hero-container" data-aos="fade-up">
-            <h1>Dog Allergy Science</h1>
-            <p>Evidence-based information about canine allergies, symptoms, and treatments</p>
-            <a href="#featured" class="btn btn-primary">Explore Articles</a>
-        </div>
-    </header>
-
     <!-- Featured Posts -->
-    <section id="featured" class="section section-white">
+    <section class="section section-white">
         <div class="content">
             <h2 class="section-title" data-aos="fade-up">Featured Posts</h2>
             <div class="blog-grid">
@@ -142,11 +133,6 @@
         </div>
     </section>
 
-    {% if config.plugins.pagination.enabled and collection.params.pagination %}
-    <div class="content">
-        {% include 'pagination.html.twig' with {'pagination':collection.params.pagination} %}
-    </div>
-    {% endif %}
     {% endblock %}
 
 {% endembed %}

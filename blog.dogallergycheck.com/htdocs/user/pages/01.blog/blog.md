@@ -12,12 +12,12 @@ content:
     order:
         by: date
         dir: desc
-    limit: 10
-    pagination: true
+    limit: 0
+    pagination: false
 
 feed:
     description: Expert insights on dog allergies, nutrition, and health from veterinary professionals and researchers.
     limit: 10
 
-pagination: true
+pagination: false
 ---
