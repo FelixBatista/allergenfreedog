@@ -12,28 +12,6 @@
     {% endif  %}
 
     {% block content %}
-    <!-- Debug Info -->
-    <div style="background: #f0f0f0; padding: 20px; margin: 20px; border: 1px solid #ccc;">
-        <h3>Debug Information:</h3>
-        <p>Collection count: {{ collection|length }}</p>
-        <p>Page title: {{ page.title }}</p>
-        <p>Page template: {{ page.template }}</p>
-        <p>Page route: {{ page.route }}</p>
-        <p>Collection items:</p>
-        <ul>
-            {% for child in collection %}
-                <li>{{ child.title }} ({{ child.date|date('Y-m-d') }}) - Route: {{ child.route }}</li>
-            {% endfor %}
-        </ul>
-    </div>
-    
-    <!-- Simple Test -->
-    <div style="background: #e8f5e8; padding: 20px; margin: 20px; border: 1px solid #4caf50;">
-        <h2>Simple Blog Test</h2>
-        <p>If you can see this, the blog template is working!</p>
-        <p>Collection has {{ collection|length }} items.</p>
-    </div>
-    
     <!-- Featured Posts -->
     <section class="section section-white">
         <div class="content">
