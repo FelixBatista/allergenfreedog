@@ -32,6 +32,10 @@ html, body {
   -moz-osx-font-smoothing: grayscale;
 }
 
+body {
+  margin-bottom: 0;
+}
+
 /* Navigation - Matching Main Website */
 .nav {
   position: sticky;
@@ -511,7 +515,7 @@ html, body {
 .newsletter {
   background: var(--accent);
   color: white;
-  padding: 40px 0;
+  padding: 40px 0 0 0;
   text-align: center;
 }
 
@@ -526,6 +530,10 @@ html, body {
   max-width: 60ch;
   margin: 0 auto 2rem;
   font-size: 1.125rem;
+}
+
+.newsletter .content {
+  padding-bottom: 40px;
 }
 
 .newsletter-form {
@@ -570,7 +578,7 @@ html, body {
 .footer {
   background: var(--ink);
   color: white;
-  margin-top: 40px;
+  margin-top: 0;
   border-top: 1px solid #e9e1d7;
 }
 
@@ -633,7 +641,7 @@ html, body {
 .footer-bottom {
   border-top: 1px solid #e9e1d7;
   margin-top: 2rem;
-  padding-top: 2rem;
+  padding: 2rem 24px 0 24px;
   text-align: center;
   color: var(--muted);
 }
