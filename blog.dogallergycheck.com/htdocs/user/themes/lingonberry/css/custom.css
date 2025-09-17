@@ -502,8 +502,15 @@ body {
 .popular-post-image {
   width: 12rem;
   height: auto;
-  object-fit: cover;
   background: linear-gradient(135deg, var(--primary), var(--accent));
+  overflow: hidden;
+}
+
+.popular-post-img {
+  width: 100%;
+  height: 200px;
+  object-fit: cover;
+  border-radius: 0;
 }
 
 .popular-post-content {
@@ -620,7 +627,7 @@ body {
 }
 
 .footer-section a:hover {
-  color: var(--ink);
+  color: var(--accent);
   text-decoration: none;
 }
 

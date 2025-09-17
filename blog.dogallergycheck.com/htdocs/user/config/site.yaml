@@ -1,15 +1,15 @@
-title: Lingonberry
-description: "Morbi leo risus, porta ac consectetur ac, vestibulum at eros. Fusce dapibus, tellus ac cursus commodo, tortor mauris condimentum nibh, ut fermentum massa justo sit amet risus."
+title: Dog Allergy Check
+description: "Science-based information to help you understand and manage your dog's allergies. Expert insights, research, and practical advice for pet owners."
 author:
-  name: Grav
-  email: 'joe@test.com'
-  url:
-  gravatar: hexplor@gmail.com
-  description: "Morbi leo risus, porta ac consectetur ac, vestibulum at eros. Fusce dapibus, tellus ac cursus commodo, tortor mauris condimentum nibh, ut fermentum massa justo sit amet risus."
+  name: Dog Allergy Check Team
+  email: 'info@dogallergycheck.com'
+  url: 'https://www.dogallergycheck.com'
+  gravatar: info@dogallergycheck.com
+  description: "Expert veterinary insights and research-based information for dog allergy management."
 blog:
   route: ''
 metadata:
-    description: 'Lingonberry is a minimal Theme designed for blogger, converted to Grav.'
+    description: 'Dog Allergy Check - Expert insights on dog allergies, nutrition, and health from veterinary professionals and researchers.'
 taxonomies: [category,tag,month]
 
 # Show calendar in sidebar
@@ -21,5 +21,5 @@ menu:
 
 # Copyright
 copyright:
-  left: <span>Copyright</span> © 2015 <a href="http://andersnoren.se/themes/lingonberry/" title="Lingonberry">Lingonberry</a>, Ported By <a href="http://www.getgrav.org" rel="dofollow" target="_blank" title="Grav">Grav Team</a>
-  right: <span>Theme by <a href="http://www.andersnoren.se">Anders Noren</a> — </span><a title="To the top" class="tothetop">Up ↑</a>
+  left: <span>Copyright</span> © {{ "now"|date("Y") }} <a href="https://www.dogallergycheck.com" title="Dog Allergy Check">Dog Allergy Check</a>
+  right: <span>Powered by <a href="https://getgrav.org" rel="dofollow" target="_blank" title="Grav">Grav</a> — </span><a title="To the top" class="tothetop">Up ↑</a>

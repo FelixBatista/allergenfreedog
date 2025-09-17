@@ -1,7 +1,8 @@
 ---
-title: Dog Allergy Blog
+title: Dog Allergy Check Blog
 blog_url: blog
 body_classes: header-image fullwidth
+template: blog
 
 sitemap:
     changefreq: monthly
