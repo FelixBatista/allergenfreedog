@@ -11,19 +11,29 @@
       Allergen Free Dog
     </a>
     
-    <div class="nav-actions">
-      <a href="https://allergenfreedog.com" class="btn btn-ghost">← Back to Main Site</a>
+    <!-- Navigation Links -->
+    <div class="nav-links">
+      <a href="/allergy-tests" class="nav-link">Allergy Tests</a>
+      <a href="/symptoms" class="nav-link">Symptoms</a>
+      <a href="/treatments" class="nav-link">Treatments</a>
+      <a href="/research-papers" class="nav-link">Research Papers</a>
+      <a href="/vet-resources" class="nav-link">Vet Resources</a>
+      <a href="/allergy-faq" class="nav-link">Allergy FAQ</a>
+      <a href="/case-studies" class="nav-link">Case Studies</a>
     </div>
     
-    <button class="mobile-menu-btn" onclick="toggleMobileMenu()">
-      <i data-feather="menu"></i>
-    </button>
+    <!-- Search Bar -->
+    <div class="nav-search">
+      <form action="/search" method="get" class="search-form">
+        <input type="text" name="q" placeholder="Search blog..." class="search-input" />
+        <button type="submit" class="search-btn">
+          <i data-feather="search"></i>
+        </button>
+      </form>
+    </div>
+    
+    <div class="nav-actions">
+      <a href="https://www.dogallergycheck.com" class="btn btn-ghost">Compare Food Tool</a>
+    </div>
   </div>
 </nav>
-
-<script>
-function toggleMobileMenu() {
-  // Mobile menu functionality can be added here
-  console.log('Mobile menu toggled');
-}
-</script>
