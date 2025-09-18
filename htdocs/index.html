@@ -231,23 +231,241 @@
     .product-stars{color:#ffc107}
     .affiliate-badge{background:linear-gradient(135deg, #ff9500 0%, #ff6b00 100%); color:white; padding:4px 8px; border-radius:6px; font-size:10px; font-weight:600; text-transform:uppercase; letter-spacing:0.5px; margin-top:8px; display:inline-block}
     
+    /* Mobile menu styles */
+    .mobile-menu-toggle {
+      display: none;
+      flex-direction: column;
+      background: none;
+      border: none;
+      cursor: pointer;
+      padding: 8px;
+      gap: 4px;
+    }
+    .mobile-menu-toggle span {
+      width: 24px;
+      height: 3px;
+      background: var(--ink);
+      border-radius: 2px;
+      transition: all 0.3s ease;
+    }
+    .mobile-menu-toggle.active span:nth-child(1) {
+      transform: rotate(45deg) translate(6px, 6px);
+    }
+    .mobile-menu-toggle.active span:nth-child(2) {
+      opacity: 0;
+    }
+    .mobile-menu-toggle.active span:nth-child(3) {
+      transform: rotate(-45deg) translate(6px, -6px);
+    }
+    
     /* Mobile responsive */
     @media (max-width: 768px) {
+      /* Mobile menu */
+      .mobile-menu-toggle {
+        display: flex;
+      }
+      .brand-text {
+        font-size: 1.1rem;
+      }
+      .actions {
+        position: fixed;
+        top: 100%;
+        left: 0;
+        right: 0;
+        background: var(--card);
+        border-top: 1px solid #e9e1d7;
+        padding: 20px;
+        flex-direction: column;
+        gap: 12px;
+        transform: translateY(-100%);
+        opacity: 0;
+        visibility: hidden;
+        transition: all 0.3s ease;
+        z-index: 1000;
+        box-shadow: var(--shadow);
+      }
+      .actions.mobile-open {
+        transform: translateY(0);
+        opacity: 1;
+        visibility: visible;
+      }
+      .actions .btn {
+        width: 100%;
+        justify-content: center;
+        padding: 12px 16px;
+        font-size: 1rem;
+      }
+      
+      /* Container and layout */
+      .container {
+        padding: 16px;
+      }
+      .hero {
+        padding: 20px 0;
+      }
+      .hero h1 {
+        font-size: 1.8rem;
+        line-height: 1.2;
+      }
+      .card {
+        padding: 16px;
+      }
+      
+      /* Forms */
+      .form .grid.two-col-form {
+        grid-template-columns: 1fr;
+        gap: 16px;
+      }
+      
+      /* Profile */
       .profile-name{max-width:80px; font-size:13px}
       .user-profile{padding:6px 8px; gap:8px}
       .profile-avatar{width:32px; height:32px}
       .profile-initials{font-size:14px}
+      
+      /* Dog selector */
       .dog-selector-section{padding:16px 0}
       .dog-selector-card{padding:16px}
       .dog-selector-header h2{font-size:20px}
       .dog-selector-header p{font-size:14px}
       .dog-selector-controls{flex-direction:column; gap:8px}
-      .dog-dropdown{min-width:180px; font-size:14px}
+      .dog-dropdown{min-width:180px; font-size:14px; width: 100%; padding: 12px; font-size: 16px}
+      .dog-control-buttons {
+        flex-direction: column;
+        gap: 8px;
+      }
+      .dog-control-buttons .btn {
+        width: 100%;
+        justify-content: center;
+      }
+      
+      /* Product suggestions */
       .suggestions-grid{gap:12px; padding:0 5px}
       .product-card{width:200px; min-width:200px; flex-shrink:0}
       .product-image{height:150px}
       .product-name{font-size:13px}
       .product-price{font-size:14px}
+      
+      /* Tables */
+      .table-container {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+      }
+      table {
+        min-width: 600px;
+      }
+      th, td {
+        padding: 8px 6px;
+        font-size: 14px;
+      }
+      
+      /* Input improvements for mobile */
+      input[type=text], textarea, select {
+        font-size: 16px; /* Prevents zoom on iOS */
+        padding: 12px 14px;
+      }
+      
+      /* Button improvements */
+      .btn {
+        padding: 12px 16px;
+        font-size: 16px;
+        min-height: 44px; /* Touch target size */
+      }
+      
+      /* Modal improvements */
+      .modal {
+        padding: 16px;
+      }
+      .modal-content {
+        max-width: 100%;
+        margin: 0;
+        border-radius: 12px;
+      }
+      .modal-header, .modal-body {
+        padding: 20px;
+      }
+      
+      /* Food entry improvements */
+      .foodEntry {
+        margin-bottom: 20px;
+        padding: 16px;
+        background: var(--bg);
+        border-radius: 12px;
+        border: 1px solid #e9e1d7;
+      }
+      .foodEntry .btn {
+        width: 100%;
+        margin-top: 12px;
+        justify-content: center;
+      }
+      .foodEntry select, .foodEntry input, .foodEntry textarea {
+        margin-bottom: 12px;
+      }
+      .add-food-btn {
+        width: 100%;
+        max-width: none;
+        margin-bottom: 16px;
+      }
+    }
+    
+    /* Extra small screens */
+    @media (max-width: 480px) {
+      .container {
+        padding: 12px;
+      }
+      .hero {
+        padding: 16px 0;
+      }
+      .hero h1 {
+        font-size: 1.6rem;
+      }
+      .card {
+        padding: 12px;
+      }
+      .dog-control-buttons .btn {
+        font-size: 14px;
+        padding: 10px 14px;
+      }
+      
+      /* Ultra-small screen improvements */
+      .brand-text {
+        font-size: 1rem;
+      }
+      .nav .actions .btn {
+        font-size: 14px;
+        padding: 10px 14px;
+      }
+      .modal-header, .modal-body {
+        padding: 16px;
+      }
+    }
+    
+    /* Touch improvements */
+    @media (hover: none) and (pointer: coarse) {
+      /* Touch device specific styles */
+      .btn:hover {
+        transform: none;
+      }
+      .chip:hover {
+        transform: none;
+      }
+      .product-card:hover {
+        transform: none;
+      }
+    }
+    
+    /* Landscape mobile */
+    @media (max-height: 500px) and (orientation: landscape) {
+      .modal {
+        padding: 8px;
+      }
+      .modal-content {
+        max-height: 90vh;
+        overflow-y: auto;
+      }
+      .hero {
+        padding: 16px 0;
+      }
     }
     .sheet .head{display:flex;justify-content:space-between;align-items:center;padding:14px 18px;border-bottom:1px solid #eef2ef}
     .sheet h3{margin:0}
@@ -338,9 +556,17 @@
     <div class="container nav">
       <div class="brand" aria-label="Dog Allergy Check brand">
         <svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M20 20c0-4 3-7 7-7s7 3 7 7-3 7-7 7-7-3-7-7Z" fill="#79C99E"/><circle cx="48" cy="20" r="6" fill="#79C99E"/><circle cx="17" cy="36" r="5" fill="#79C99E"/><circle cx="35" cy="43" r="5" fill="#79C99E"/><path d="M20 53c6 5 18 5 24 0 5-4 6-11 2-16-6-7-22-7-28 0-4 5-3 12 2 16Z" fill="#FF9F68"/></svg>
-        Dog Allergy Check
+        <span class="brand-text">Dog Allergy Check</span>
       </div>
-      <div class="actions">
+      
+      <!-- Mobile menu button -->
+      <button class="mobile-menu-toggle" id="mobileMenuToggle" aria-label="Toggle menu">
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+      
+      <div class="actions" id="navActions">
         <button class="btn ghost" id="openGlossary">Ingredient Glossary</button>
         <a class="btn ghost" href="allergy-testing.html">Allergy Testing Guide</a>
         <a class="btn ghost" href="https://blog.dogallergycheck.com">Blog</a>
@@ -396,8 +622,8 @@
         <div id="dogManagement" style="display: none;">
           <h3>Your Dogs</h3>
           <div id="dogList"></div>
-          <div id="createDogSection">
-            <input type="text" id="newDogName" placeholder="Enter dog name" style="margin-right: 8px;">
+          <div id="createDogSection" style="display: flex; flex-direction: column; gap: 12px;">
+            <input type="text" id="newDogName" placeholder="Enter dog name">
             <button id="addDogBtn" class="btn primary">Add Dog</button>
           </div>
         </div>
@@ -577,7 +803,7 @@
         <button type="button" class="chip" data-filter="allergens">Allergens only</button>
         <button type="button" class="chip" data-filter="overlap">Overlaps only</button>
       </div>
-      <div style="overflow:auto">
+      <div class="table-container">
         <table id="compareTable"></table>
       </div>
     </section>
@@ -1643,6 +1869,33 @@
       document.getElementById('logoutBtn').addEventListener('click', () => {
         auth.signOut();
       });
+
+      // Mobile menu toggle
+      const mobileMenuToggle = document.getElementById('mobileMenuToggle');
+      const navActions = document.getElementById('navActions');
+      
+      if (mobileMenuToggle && navActions) {
+        mobileMenuToggle.addEventListener('click', () => {
+          mobileMenuToggle.classList.toggle('active');
+          navActions.classList.toggle('mobile-open');
+        });
+        
+        // Close mobile menu when clicking outside
+        document.addEventListener('click', (e) => {
+          if (!mobileMenuToggle.contains(e.target) && !navActions.contains(e.target)) {
+            mobileMenuToggle.classList.remove('active');
+            navActions.classList.remove('mobile-open');
+          }
+        });
+        
+        // Close mobile menu when window is resized to desktop
+        window.addEventListener('resize', () => {
+          if (window.innerWidth > 768) {
+            mobileMenuToggle.classList.remove('active');
+            navActions.classList.remove('mobile-open');
+          }
+        });
+      }
 
       // Profile click handler to toggle dropdown
       document.addEventListener('click', (e) => {
