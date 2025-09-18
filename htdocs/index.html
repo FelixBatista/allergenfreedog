@@ -331,12 +331,13 @@
       .dog-selector-controls{flex-direction:column; gap:8px}
       .dog-dropdown{min-width:180px; font-size:14px; width: 100%; padding: 12px; font-size: 16px}
       .dog-control-buttons {
-        flex-direction: column;
+        flex-direction: row;
         gap: 8px;
       }
       .dog-control-buttons .btn {
-        width: 100%;
+        flex: 1;
         justify-content: center;
+        min-width: 0;
       }
       
       /* Product suggestions */
@@ -357,6 +358,37 @@
       th, td {
         padding: 8px 6px;
         font-size: 14px;
+      }
+      
+      /* Mobile table specific styles */
+      .mobile-legend {
+        margin-bottom: 16px !important;
+      }
+      table.mobile-table {
+        min-width: auto;
+        width: 100%;
+      }
+      table.mobile-table th,
+      table.mobile-table td {
+        padding: 8px 4px;
+        font-size: 12px;
+        vertical-align: top;
+      }
+      table.mobile-table th {
+        font-size: 13px;
+        font-weight: 600;
+        background: var(--primary);
+        color: white;
+        text-align: center;
+      }
+      table.mobile-table th:first-child {
+        text-align: left;
+      }
+      table.mobile-table .pill {
+        font-size: 10px;
+        padding: 2px 4px;
+        margin: 1px;
+        display: inline-block;
       }
       
       /* Input improvements for mobile */
@@ -424,7 +456,8 @@
       }
       .dog-control-buttons .btn {
         font-size: 14px;
-        padding: 10px 14px;
+        padding: 10px 8px;
+        min-width: 0;
       }
       
       /* Ultra-small screen improvements */
@@ -498,12 +531,13 @@
     }
     @media (max-width: 480px) {
       .dog-control-buttons {
-        flex-direction: column;
+        flex-direction: row;
         gap: 6px;
       }
       .dog-control-buttons .btn {
-        width: 100%;
+        flex: 1;
         justify-content: center;
+        min-width: 0;
       }
     }
   </style>
@@ -1497,6 +1531,62 @@
     function displayComparisonTable(comparisonData, triggering, safe, prefs) {
       const allFoods = [...triggering, ...safe];
       const tbl = document.getElementById('compareTable');
+      
+      // Remove any existing mobile legend before switching views
+      const existingLegend = document.querySelector('.mobile-legend');
+      if (existingLegend) {
+        existingLegend.remove();
+      }
+      
+      // Check if we're on mobile
+      const isMobile = window.innerWidth <= 768;
+      
+      if (isMobile) {
+        displayMobileComparisonTable(comparisonData, triggering, safe, prefs);
+      } else {
+        displayDesktopComparisonTable(comparisonData, triggering, safe, prefs);
+      }
+      
+      document.getElementById('legend').hidden = false;
+      document.getElementById('resultNote').textContent = `${comparisonData.length} unique ingredients normalised. Found ${nonSimilarIngredients.length} non-similar ingredients. Click column headers to sort (browser shortcuts).`;
+      applyRowFilter();
+      
+      // Show safe food suggestions based on non-similar ingredients
+      renderSafeFoodSuggestions(nonSimilarIngredients, comparisonData);
+    }
+
+    // Handle window resize to switch between mobile and desktop table views
+    let resizeTimeout;
+    window.addEventListener('resize', () => {
+      clearTimeout(resizeTimeout);
+      resizeTimeout = setTimeout(() => {
+        // Only re-render if we have comparison data and the view type changed
+        if (lastComparison) {
+          const wasMobile = window.innerWidth <= 768;
+          const isMobile = window.innerWidth <= 768;
+          
+          // Remove existing mobile legend if it exists
+          const existingLegend = document.querySelector('.mobile-legend');
+          if (existingLegend) {
+            existingLegend.remove();
+          }
+          
+          // Re-render the table with the new layout
+          displayComparisonTable(lastComparison.comparisonData, lastComparison.triggering, lastComparison.safe, {
+            noGluten: document.getElementById('noGluten').checked,
+            noPoultry: document.getElementById('noPoultry').checked,
+            hydrolysedOk: document.getElementById('hydrolysedOk').checked
+          });
+        }
+      }, 250); // Debounce resize events
+    });
+
+    function displayDesktopComparisonTable(comparisonData, triggering, safe, prefs) {
+      const allFoods = [...triggering, ...safe];
+      const tbl = document.getElementById('compareTable');
+      
+      // Remove mobile-table class and reset to desktop
+      tbl.className = '';
       const cols = ['Ingredient', ...allFoods.map(p=>p.label), 'Allergen note'];
       tbl.innerHTML = '<thead><tr>' + cols.map(c=>`<th>${c}</th>`).join('') + '</tr></thead><tbody></tbody>';
       const body = tbl.querySelector('tbody');
@@ -1536,13 +1626,101 @@
         tableRow.innerHTML = `<td>${ingredientName}</td>${cells.join('')}<td><span class="${cls}">${risk.toUpperCase()}</span> ${note}</td>`;
         body.append(tableRow);
       });
+    }
 
-      document.getElementById('legend').hidden = false;
-      document.getElementById('resultNote').textContent = `${comparisonData.length} unique ingredients normalised. Found ${nonSimilarIngredients.length} non-similar ingredients. Click column headers to sort (browser shortcuts).`;
-      applyRowFilter();
+    function displayMobileComparisonTable(comparisonData, triggering, safe, prefs) {
+      const tbl = document.getElementById('compareTable');
       
-      // Show safe food suggestions based on non-similar ingredients
-      renderSafeFoodSuggestions(nonSimilarIngredients, comparisonData);
+      // Create mobile-friendly table structure
+      tbl.className = 'mobile-table';
+      tbl.innerHTML = `
+        <thead>
+          <tr>
+            <th>Ingredient</th>
+            <th>Risk</th>
+            <th>In Foods</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      `;
+      
+      const body = tbl.querySelector('tbody');
+      
+      // Create legend for mobile
+      const legendHtml = `
+        <div class="mobile-legend" style="margin-bottom: 16px; padding: 12px; background: var(--bg); border-radius: 8px; border: 1px solid #e9e1d7;">
+          <h4 style="margin: 0 0 8px 0; font-size: 14px; color: var(--ink);">📱 Quick Guide:</h4>
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 6px; font-size: 11px; margin-bottom: 8px;">
+            <div><span class="pill danger" style="font-size: 9px; padding: 1px 3px;">DANGER</span> High risk</div>
+            <div><span class="pill warn" style="font-size: 9px; padding: 1px 3px;">WARN</span> Medium risk</div>
+            <div><span class="pill ok" style="font-size: 9px; padding: 1px 3px;">OK</span> Low risk</div>
+            <div><span class="pill danger" style="font-size: 9px; padding: 1px 3px;">⚠️</span> Non-similar</div>
+          </div>
+          <div style="font-size: 11px; color: var(--muted); margin-bottom: 4px;">
+            <strong>Colored Balls in "In Foods" column:</strong>
+          </div>
+          <div style="font-size: 11px; color: var(--ink);">
+            <span style="color: #ff4757;">🔴</span> = Found in <strong>triggering</strong> foods (number shows how many)<br>
+            <span style="color: #2ed573;">🟢</span> = Found in <strong>safe</strong> foods (number shows how many)
+          </div>
+        </div>
+      `;
+      
+      // Insert legend before table
+      tbl.insertAdjacentHTML('beforebegin', legendHtml);
+      
+      comparisonData.forEach(rowData => {
+        const name = rowData.ingredient;
+        
+        // Count presence in each category
+        let triggeringCount = 0;
+        let safeCount = 0;
+        
+        triggering.forEach(p => {
+          if (rowData.presence[p.label]) triggeringCount++;
+        });
+        
+        safe.forEach(p => {
+          if (rowData.presence[p.label]) safeCount++;
+        });
+        
+        // Create food indicators
+        let foodIndicators = '';
+        if (triggeringCount > 0) foodIndicators += `🔴${triggeringCount}`;
+        if (safeCount > 0) foodIndicators += `🟢${safeCount}`;
+        
+        // allergen note & class
+        const risk = allergenClass(name, prefs);
+        const cls = risk==='danger' ? 'pill danger' : risk==='warn' ? 'pill warn' : 'pill ok';
+        const note = [noteFor(name) || ''].filter(Boolean).join(' ');
+        
+        // non-similar indicator
+        const isNonSimilar = nonSimilarIngredients.includes(name);
+        
+        const tableRow = document.createElement('tr');
+        tableRow.className = 'hover';
+        if (isNonSimilar) {
+          tableRow.classList.add('non-similar');
+        }
+        tableRow.dataset.count = triggeringCount + safeCount;
+        tableRow.dataset.risk = risk;
+        
+        // Create ingredient name with non-similar indicator
+        const ingredientName = isNonSimilar ? 
+          `<strong>${name}</strong><br><small class="pill danger" style="font-size: 10px; padding: 2px 4px;">⚠️ NON-SIMILAR</small>` : 
+          `<strong>${name}</strong>`;
+        
+        // Create risk indicator with note
+        const riskIndicator = `<span class="${cls}" style="font-size: 11px;">${risk.toUpperCase()}</span>`;
+        const riskNote = note ? `<br><small style="color: var(--muted); font-size: 11px;">${note}</small>` : '';
+        
+        tableRow.innerHTML = `
+          <td style="font-size: 13px;">${ingredientName}</td>
+          <td style="text-align: center; font-size: 12px;">${riskIndicator}${riskNote}</td>
+          <td style="text-align: center; font-size: 14px;">${foodIndicators || '❌'}</td>
+        `;
+        body.append(tableRow);
+      });
     }
 
     // Safe Food Finder functionality
