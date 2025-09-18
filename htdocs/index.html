@@ -262,6 +262,32 @@
     .gloss h4{margin:0 0 6px}
     .muted{color:var(--muted)}
     .sr{position:absolute;left:-10000px}
+
+    /* Delete button styling */
+    .delete-btn {
+      background: #ff4757 !important;
+      color: white !important;
+      border: 2px solid #ff4757 !important;
+    }
+    .delete-btn:hover {
+      background: #ff3742 !important;
+      border-color: #ff3742 !important;
+      transform: translateY(-1px);
+      box-shadow: 0 2px 8px rgba(255, 71, 87, 0.3);
+    }
+    .dog-control-buttons {
+      flex-wrap: wrap;
+    }
+    @media (max-width: 480px) {
+      .dog-control-buttons {
+        flex-direction: column;
+        gap: 6px;
+      }
+      .dog-control-buttons .btn {
+        width: 100%;
+        justify-content: center;
+      }
+    }
   </style>
   
   <!-- Favicon and meta tags -->
@@ -348,7 +374,10 @@
           <select id="dogSelectDropdown" class="dog-dropdown">
             <option value="">Select a dog...</option>
           </select>
-          <button id="addNewDog" class="btn primary">+ Add New Dog</button>
+          <div class="dog-control-buttons" style="display: flex; gap: 8px;">
+            <button id="addNewDog" class="btn primary">+ Add New Dog</button>
+            <button id="deleteSelectedDog" class="btn ghost delete-btn" style="display: none;">🗑️ Delete Dog</button>
+          </div>
         </div>
       </div>
     </div>
@@ -1672,6 +1701,11 @@
         showAddDogDialog();
       });
 
+      // Delete selected dog button
+      document.getElementById('deleteSelectedDog').addEventListener('click', () => {
+        deleteSelectedDog();
+      });
+
       // Dog selector dropdown
       document.getElementById('dogSelectDropdown').addEventListener('change', async (e) => {
         if (e.target.value) {
@@ -1929,6 +1963,7 @@
       const dogSelectDropdown = document.getElementById('dogSelectDropdown');
       const currentDogName = document.getElementById('currentDogName');
       const indicatorDogName = document.getElementById('indicatorDogName');
+      const deleteButton = document.getElementById('deleteSelectedDog');
       
       dogSelectDropdown.innerHTML = '<option value="">Select a dog...</option>' + 
         userDogs.map(dog => `<option value="${dog.id}" ${dog.id === currentDogId ? 'selected' : ''}>${dog.name}</option>`).join('');
@@ -1940,9 +1975,17 @@
           currentDogName.textContent = currentDog.name;
           indicatorDogName.textContent = currentDog.name;
         }
+        // Show delete button when a dog is selected
+        if (deleteButton) {
+          deleteButton.style.display = 'inline-block';
+        }
       } else {
         currentDogName.textContent = 'your dog';
         indicatorDogName.textContent = 'your dog';
+        // Hide delete button when no dog is selected
+        if (deleteButton) {
+          deleteButton.style.display = 'none';
+        }
       }
     }
 
@@ -2041,6 +2084,48 @@
 
       await createDog(dogName);
       document.getElementById('newDogName').value = '';
+    }
+
+    async function deleteSelectedDog() {
+      if (!auth.currentUser) {
+        alert('Please sign in first');
+        return;
+      }
+
+      if (!currentDogId) {
+        alert('No dog selected');
+        return;
+      }
+
+      const dog = userDogs.find(d => d.id === currentDogId);
+      if (!dog) {
+        alert('Dog not found');
+        return;
+      }
+
+      // Confirm deletion
+      if (!confirm(`Are you sure you want to delete ${dog.name}? This will also delete all saved comparisons for this dog.`)) {
+        return;
+      }
+
+      try {
+        // Delete the dog document and all its subcollections
+        await db.collection('users').doc(auth.currentUser.uid)
+          .collection('dogs').doc(currentDogId).delete();
+
+        // Remove from local array
+        userDogs = userDogs.filter(d => d.id !== currentDogId);
+
+        // Select another dog or clear selection
+        currentDogId = userDogs.length > 0 ? userDogs[0].id : null;
+
+        // Update UI
+        updateAuthUI(true);
+        showSuccess(`${dog.name} has been deleted successfully.`);
+      } catch (error) {
+        console.error('Error deleting dog:', error);
+        showError('Failed to delete dog. Please try again.');
+      }
     }
 
     async function loadLastComparison(dogId) {
