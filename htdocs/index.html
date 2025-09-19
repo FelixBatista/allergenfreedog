@@ -501,6 +501,276 @@
       }
     }
 
+    /* Mobile App Flow Styles */
+    .mobile-app-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: var(--bg);
+      z-index: 10000;
+      overflow-y: auto;
+    }
+
+    .mobile-dialog {
+      display: none;
+      min-height: 100vh;
+      padding: 20px 20px 120px 20px; /* Extra bottom padding for browser UI */
+      box-sizing: border-box;
+    }
+
+    .mobile-dialog.active {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .mobile-dialog-content {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      max-width: 100%;
+      margin: 0 auto;
+      min-height: calc(100vh - 140px); /* Ensure content doesn't get cut off */
+    }
+
+    .mobile-dialog-header {
+      text-align: center;
+      margin-bottom: 24px;
+    }
+
+    .mobile-dialog-header h2 {
+      margin: 0 0 8px 0;
+      color: var(--ink);
+      font-size: 1.5rem;
+    }
+
+    .step-indicator {
+      color: var(--muted);
+      font-size: 14px;
+      margin: 0;
+    }
+
+    .mobile-dialog-body {
+      flex: 1;
+      margin-bottom: 24px;
+    }
+
+    .mobile-dialog-body p {
+      color: var(--muted);
+      line-height: 1.5;
+      margin-bottom: 20px;
+    }
+
+    .mobile-dialog-features {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .feature-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px;
+      background: var(--card);
+      border-radius: 8px;
+      border: 1px solid var(--border);
+    }
+
+    .feature-icon {
+      font-size: 1.2rem;
+    }
+
+    .mobile-food-selector {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .mobile-filter-section {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .mobile-filter-section label {
+      font-weight: 500;
+      color: var(--ink);
+    }
+
+    .mobile-search-section {
+      position: relative;
+    }
+
+    .mobile-search-input {
+      width: 100%;
+      padding: 12px 16px;
+      border: 2px solid var(--border);
+      border-radius: 8px;
+      font-size: 16px;
+      background: var(--bg);
+      color: var(--ink);
+      box-sizing: border-box;
+    }
+
+    .mobile-search-input:focus {
+      outline: none;
+      border-color: var(--primary);
+    }
+
+    .mobile-food-list {
+      max-height: 200px;
+      overflow-y: auto;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      background: var(--card);
+    }
+
+    .mobile-food-item {
+      padding: 12px 16px;
+      border-bottom: 1px solid var(--border);
+      cursor: pointer;
+      transition: background-color 0.2s;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .mobile-food-item:last-child {
+      border-bottom: none;
+    }
+
+    .mobile-food-item:hover {
+      background: var(--bg);
+    }
+
+    .mobile-food-item.selected {
+      background: var(--primary);
+      color: white;
+    }
+
+    .mobile-food-name {
+      font-weight: 500;
+    }
+
+    .mobile-food-brand {
+      font-size: 12px;
+      opacity: 0.7;
+    }
+
+    .mobile-selected-foods {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 16px;
+    }
+
+    .mobile-selected-foods h4 {
+      margin: 0 0 12px 0;
+      color: var(--ink);
+      font-size: 16px;
+    }
+
+    .mobile-selected-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 8px 12px;
+      background: var(--bg);
+      border-radius: 6px;
+      margin-bottom: 8px;
+    }
+
+    .mobile-selected-item:last-child {
+      margin-bottom: 0;
+    }
+
+    .remove-selected {
+      background: var(--danger);
+      color: white;
+      border: none;
+      border-radius: 4px;
+      padding: 4px 8px;
+      font-size: 12px;
+      cursor: pointer;
+    }
+
+    .mobile-summary {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      margin-bottom: 20px;
+    }
+
+    .summary-section {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 16px;
+    }
+
+    .summary-section h4 {
+      margin: 0 0 12px 0;
+      color: var(--ink);
+      font-size: 16px;
+    }
+
+    .summary-item {
+      padding: 8px 12px;
+      background: var(--bg);
+      border-radius: 6px;
+      margin-bottom: 8px;
+      font-size: 14px;
+    }
+
+    .summary-item:last-child {
+      margin-bottom: 0;
+    }
+
+    .mobile-dialog-footer {
+      display: flex;
+      gap: 12px;
+      justify-content: space-between;
+      position: sticky;
+      bottom: 0;
+      background: var(--bg);
+      padding: 20px 0 0 0;
+      margin-top: auto;
+      z-index: 10;
+    }
+
+    .mobile-dialog-btn {
+      flex: 1;
+      padding: 14px 20px;
+      font-size: 16px;
+      border-radius: 8px;
+      border: none;
+      cursor: pointer;
+      font-weight: 500;
+      transition: all 0.2s;
+    }
+
+    .mobile-dialog-btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    .mobile-dialog-btn.ghost {
+      background: transparent;
+      border: 2px solid var(--border);
+      color: var(--ink);
+    }
+
+    .mobile-dialog-btn.primary {
+      background: var(--primary);
+      color: white;
+    }
+
+    .mobile-dialog-btn.primary:hover:not(:disabled) {
+      background: var(--accent);
+    }
+
     .sheet .head{display:flex;justify-content:space-between;align-items:center;padding:14px 18px;border-bottom:1px solid #eef2ef}
     .sheet h3{margin:0}
     .sheet .body{padding:12px 18px 22px}
@@ -605,6 +875,7 @@
         <button class="btn ghost" id="openGlossary">Ingredient Glossary</button>
         <a class="btn ghost" href="allergy-testing.html">Allergy Testing Guide</a>
         <a class="btn ghost" href="https://blog.dogallergycheck.com">Blog</a>
+        <button class="btn ghost" onclick="startMobileAppFlow()" id="showTutorialBtn">Show Tutorial</button>
         <button class="btn" id="loginBtn" style="display: none; background: #4285f4; color: white; border: none;">Log In</button>
         <div id="userInfo" style="display: none;">
           <div id="userProfile" class="user-profile">
@@ -636,7 +907,7 @@
             <option value="">Select a dog...</option>
           </select>
           <div class="dog-control-buttons" style="display: flex; gap: 8px;">
-            <button id="addNewDog" class="btn primary">+ Add New Dog</button>
+          <button id="addNewDog" class="btn primary">+ Add New Dog</button>
             <button id="deleteSelectedDog" class="btn ghost delete-btn" style="display: none;">🗑️ Delete Dog</button>
           </div>
         </div>
@@ -734,6 +1005,150 @@
     </div>
   </div>
 
+
+  <!-- Mobile App Flow - Guided Experience for First-Time Users -->
+  <div id="mobileAppFlow" class="mobile-app-overlay" style="display: none;">
+    
+    <!-- Step 1: Welcome Dialog -->
+    <div id="welcomeStep" class="mobile-dialog active">
+      <div class="mobile-dialog-content">
+        <div class="mobile-dialog-header">
+          <h2>🐾 Welcome to Dog Allergy Check!</h2>
+        </div>
+        <div class="mobile-dialog-body">
+          <p>We'll help you find what's causing your dog's food allergies by comparing ingredients.</p>
+          <div class="mobile-dialog-features">
+            <div class="feature-item">
+              <span class="feature-icon">🍖</span>
+              <span>Add foods that caused allergic reactions</span>
+            </div>
+            <div class="feature-item">
+              <span class="feature-icon">✅</span>
+              <span>Add foods your dog tolerates well</span>
+            </div>
+            <div class="feature-item">
+              <span class="feature-icon">🔍</span>
+              <span>Compare ingredients to find allergens</span>
+            </div>
+          </div>
+        </div>
+        <div class="mobile-dialog-footer">
+          <button class="btn primary mobile-dialog-btn" onclick="nextMobileStep()">Let's Start! →</button>
+        </div>
+        <div class="mobile-dialog-footer" style="margin-top: 12px;">
+          <button class="btn ghost mobile-dialog-btn" onclick="skipTutorialAndLogin()" style="background: #4285f4; color: white; border: 2px solid #4285f4;">Login & Skip Tutorial</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Step 2: Triggering Foods Dialog -->
+    <div id="triggeringStep" class="mobile-dialog">
+      <div class="mobile-dialog-content">
+        <div class="mobile-dialog-header">
+          <h2>🍖 Foods That Caused Allergic Reactions</h2>
+          <p class="step-indicator">Step 1 of 3</p>
+        </div>
+        <div class="mobile-dialog-body">
+          <p>Select foods that have caused allergic reactions in your dog. You can add multiple foods.</p>
+          
+          <div class="mobile-food-selector">
+            <div class="mobile-filter-section">
+              <label>Filter by brand:</label>
+              <select id="mobileTriggeringBrandFilter" onchange="filterMobileFoods('triggering')">
+                <option value="">All brands</option>
+              </select>
+            </div>
+            
+            <div class="mobile-search-section">
+              <input type="text" id="mobileTriggeringSearch" placeholder="Search for dog food..." 
+                     onkeyup="filterMobileFoods('triggering')" class="mobile-search-input">
+            </div>
+            
+            <div class="mobile-food-list" id="mobileTriggeringFoodList">
+              <!-- Foods will be populated by JavaScript -->
+            </div>
+            
+            <div class="mobile-selected-foods" id="mobileTriggeringSelected">
+              <h4>Selected Foods:</h4>
+              <div id="mobileTriggeringSelectedList"></div>
+            </div>
+          </div>
+        </div>
+        <div class="mobile-dialog-footer">
+          <button class="btn ghost mobile-dialog-btn" onclick="prevMobileStep()">← Back</button>
+          <button class="btn primary mobile-dialog-btn" onclick="nextMobileStep()" id="triggeringNextBtn" disabled>Next →</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Step 3: Safe Foods Dialog -->
+    <div id="safeStep" class="mobile-dialog">
+      <div class="mobile-dialog-content">
+        <div class="mobile-dialog-header">
+          <h2>✅ Foods Your Dog Tolerates Well</h2>
+          <p class="step-indicator">Step 2 of 3</p>
+        </div>
+        <div class="mobile-dialog-body">
+          <p>Select foods that your dog can eat without any allergic reactions. These help us identify what's safe.</p>
+          
+          <div class="mobile-food-selector">
+            <div class="mobile-filter-section">
+              <label>Filter by brand:</label>
+              <select id="mobileSafeBrandFilter" onchange="filterMobileFoods('safe')">
+                <option value="">All brands</option>
+              </select>
+            </div>
+            
+            <div class="mobile-search-section">
+              <input type="text" id="mobileSafeSearch" placeholder="Search for dog food..." 
+                     onkeyup="filterMobileFoods('safe')" class="mobile-search-input">
+            </div>
+            
+            <div class="mobile-food-list" id="mobileSafeFoodList">
+              <!-- Foods will be populated by JavaScript -->
+            </div>
+            
+            <div class="mobile-selected-foods" id="mobileSafeSelected">
+              <h4>Selected Foods:</h4>
+              <div id="mobileSafeSelectedList"></div>
+            </div>
+          </div>
+        </div>
+        <div class="mobile-dialog-footer">
+          <button class="btn ghost mobile-dialog-btn" onclick="prevMobileStep()">← Back</button>
+          <button class="btn primary mobile-dialog-btn" onclick="nextMobileStep()" id="safeNextBtn" disabled>Next →</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Step 4: Build Comparison Dialog -->
+    <div id="buildStep" class="mobile-dialog">
+      <div class="mobile-dialog-content">
+        <div class="mobile-dialog-header">
+          <h2>🔍 Ready to Compare!</h2>
+          <p class="step-indicator">Step 3 of 3</p>
+        </div>
+        <div class="mobile-dialog-body">
+          <div class="mobile-summary">
+            <div class="summary-section">
+              <h4>🍖 Triggering Foods (<span id="triggeringCount">0</span>):</h4>
+              <div id="triggeringSummary"></div>
+            </div>
+            <div class="summary-section">
+              <h4>✅ Safe Foods (<span id="safeCount">0</span>):</h4>
+              <div id="safeSummary"></div>
+            </div>
+          </div>
+          <p>Click "Build Comparison" to analyze the ingredients and find potential allergens. You'll then see the full website with your results!</p>
+        </div>
+        <div class="mobile-dialog-footer">
+          <button class="btn ghost mobile-dialog-btn" onclick="prevMobileStep()">← Back</button>
+          <button class="btn primary mobile-dialog-btn" onclick="buildMobileComparison()">Build Comparison →</button>
+        </div>
+      </div>
+    </div>
+
+  </div>
 
   <!-- auth panel removed; login handled via dialog (not inlined) -->
 
@@ -3025,6 +3440,394 @@
       // You can implement a toast notification system here
       alert('Success: ' + message);
     }
+
+    // Mobile App Flow JavaScript
+    let mobileCurrentStep = 0;
+    let mobileTriggeringFoods = [];
+    let mobileSafeFoods = [];
+    let mobileFilteredFoods = [];
+
+    const mobileSteps = ['welcomeStep', 'triggeringStep', 'safeStep', 'buildStep'];
+
+    function startMobileAppFlow() {
+      console.log('Starting mobile app flow...');
+      console.log('Window width:', window.innerWidth);
+      
+      // Show tutorial on mobile devices
+      if (window.innerWidth <= 768) {
+        console.log('Starting mobile app flow...');
+        document.getElementById('mobileAppFlow').style.display = 'block';
+        document.body.style.overflow = 'hidden';
+        loadMobileFoodCatalog();
+      } else {
+        console.log('Mobile app flow only available on mobile devices');
+        alert('Tutorial is only available on mobile devices. Please use a mobile device or resize your browser window.');
+      }
+    }
+
+    function autoStartMobileAppFlow() {
+      // Always show mobile app flow on mobile devices, regardless of previous usage
+      if (window.innerWidth <= 768) {
+        console.log('Auto-starting mobile app flow for mobile device...');
+        document.getElementById('mobileAppFlow').style.display = 'block';
+        document.body.style.overflow = 'hidden';
+        loadMobileFoodCatalog();
+      }
+    }
+
+    function skipTutorialAndLogin() {
+      // Hide mobile app flow
+      document.getElementById('mobileAppFlow').style.display = 'none';
+      document.body.style.overflow = 'auto';
+      
+      // Show login dialog
+      document.getElementById('loginModal').style.display = 'flex';
+    }
+
+    function nextMobileStep() {
+      if (mobileCurrentStep < mobileSteps.length - 1) {
+        mobileCurrentStep++;
+        showMobileStep();
+      }
+    }
+
+    function prevMobileStep() {
+      if (mobileCurrentStep > 0) {
+        mobileCurrentStep--;
+        showMobileStep();
+      }
+    }
+
+    function showMobileStep() {
+      // Hide all steps
+      mobileSteps.forEach(step => {
+        document.getElementById(step).classList.remove('active');
+      });
+      
+      // Show current step
+      document.getElementById(mobileSteps[mobileCurrentStep]).classList.add('active');
+      
+      // Load step-specific data
+      switch (mobileCurrentStep) {
+        case 1: // Triggering foods step
+          populateMobileFoodList('triggering');
+          break;
+        case 2: // Safe foods step
+          populateMobileFoodList('safe');
+          break;
+        case 3: // Build comparison step
+          updateMobileSummary();
+          break;
+      }
+    }
+
+    async function loadMobileFoodCatalog() {
+      try {
+        console.log('Fetching food catalog from API...');
+        const response = await fetch('./api/food_catalog.php');
+        console.log('API response status:', response.status);
+        
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        
+        const result = await response.json();
+        console.log('API response:', result);
+        
+        if (result.success && result.data) {
+          mobileFilteredFoods = result.data;
+          console.log('Loaded', mobileFilteredFoods.length, 'foods from database');
+        } else {
+          throw new Error('Invalid API response format: ' + JSON.stringify(result));
+        }
+        
+        populateBrandFilters();
+      } catch (error) {
+        console.error('Error loading food catalog:', error);
+        console.error('Error details:', {
+          message: error.message,
+          stack: error.stack,
+          response: error.response
+        });
+        // Fallback to a basic list if API fails
+        mobileFilteredFoods = [
+          { name: 'Sample Dog Food', brand: 'Sample Brand', ingredients: 'chicken, rice, vegetables' }
+        ];
+        console.log('Using fallback sample data');
+        populateBrandFilters();
+      }
+    }
+
+    function populateBrandFilters() {
+      const brands = [...new Set(mobileFilteredFoods.map(food => food.brand))].sort();
+      
+      const triggeringBrandSelect = document.getElementById('mobileTriggeringBrandFilter');
+      const safeBrandSelect = document.getElementById('mobileSafeBrandFilter');
+      
+      [triggeringBrandSelect, safeBrandSelect].forEach(select => {
+        select.innerHTML = '<option value="">All brands</option>';
+        brands.forEach(brand => {
+          select.innerHTML += `<option value="${brand}">${brand}</option>`;
+        });
+      });
+    }
+
+    function populateMobileFoodList(type) {
+      const foodList = document.getElementById(`mobile${type === 'triggering' ? 'Triggering' : 'Safe'}FoodList`);
+      const searchInput = document.getElementById(`mobile${type === 'triggering' ? 'Triggering' : 'Safe'}Search`);
+      const brandFilter = document.getElementById(`mobile${type === 'triggering' ? 'Triggering' : 'Safe'}BrandFilter`);
+      
+      const searchTerm = searchInput.value.toLowerCase();
+      const brandFilterValue = brandFilter.value;
+      
+      const filtered = mobileFilteredFoods.filter(food => {
+        const matchesSearch = food.name.toLowerCase().includes(searchTerm);
+        const matchesBrand = !brandFilterValue || food.brand === brandFilterValue;
+        return matchesSearch && matchesBrand;
+      });
+      
+      foodList.innerHTML = '';
+      
+      if (filtered.length === 0) {
+        foodList.innerHTML = '<div style="padding: 20px; text-align: center; color: var(--muted);">No foods found</div>';
+        return;
+      }
+      
+      filtered.forEach(food => {
+        const foodItem = document.createElement('div');
+        foodItem.className = 'mobile-food-item';
+        foodItem.innerHTML = `
+          <div>
+            <div class="mobile-food-name">${food.name}</div>
+            <div class="mobile-food-brand">${food.brand}</div>
+          </div>
+        `;
+        
+        foodItem.addEventListener('click', () => {
+          toggleMobileFoodSelection(type, food);
+        });
+        
+        foodList.appendChild(foodItem);
+      });
+    }
+
+    function filterMobileFoods(type) {
+      populateMobileFoodList(type);
+    }
+
+    function toggleMobileFoodSelection(type, food) {
+      const selectedFoods = type === 'triggering' ? mobileTriggeringFoods : mobileSafeFoods;
+      const selectedList = document.getElementById(`mobile${type === 'triggering' ? 'Triggering' : 'Safe'}SelectedList`);
+      const nextBtn = document.getElementById(`${type}NextBtn`);
+      
+      const existingIndex = selectedFoods.findIndex(f => f.name === food.name && f.brand === food.brand);
+      
+      if (existingIndex === -1) {
+        // Add food
+        selectedFoods.push(food);
+      } else {
+        // Remove food
+        selectedFoods.splice(existingIndex, 1);
+      }
+      
+      updateMobileSelectedList(type, selectedList);
+      nextBtn.disabled = selectedFoods.length === 0;
+    }
+
+    function updateMobileSelectedList(type, selectedList) {
+      const selectedFoods = type === 'triggering' ? mobileTriggeringFoods : mobileSafeFoods;
+      
+      selectedList.innerHTML = '';
+      
+      if (selectedFoods.length === 0) {
+        selectedList.innerHTML = '<div style="color: var(--muted); font-style: italic;">No foods selected</div>';
+        return;
+      }
+      
+      selectedFoods.forEach((food, index) => {
+        const selectedItem = document.createElement('div');
+        selectedItem.className = 'mobile-selected-item';
+        selectedItem.innerHTML = `
+          <div>
+            <div class="mobile-food-name">${food.name}</div>
+            <div class="mobile-food-brand">${food.brand}</div>
+          </div>
+          <button class="remove-selected" onclick="removeMobileFood('${type}', ${index})">Remove</button>
+        `;
+        selectedList.appendChild(selectedItem);
+      });
+    }
+
+    function removeMobileFood(type, index) {
+      if (type === 'triggering') {
+        mobileTriggeringFoods.splice(index, 1);
+        updateMobileSelectedList(type, document.getElementById('mobileTriggeringSelectedList'));
+        document.getElementById('triggeringNextBtn').disabled = mobileTriggeringFoods.length === 0;
+      } else {
+        mobileSafeFoods.splice(index, 1);
+        updateMobileSelectedList(type, document.getElementById('mobileSafeSelectedList'));
+        document.getElementById('safeNextBtn').disabled = mobileSafeFoods.length === 0;
+      }
+    }
+
+    function updateMobileSummary() {
+      document.getElementById('triggeringCount').textContent = mobileTriggeringFoods.length;
+      document.getElementById('safeCount').textContent = mobileSafeFoods.length;
+      
+      const triggeringSummary = document.getElementById('triggeringSummary');
+      const safeSummary = document.getElementById('safeSummary');
+      
+      triggeringSummary.innerHTML = '';
+      mobileTriggeringFoods.forEach(food => {
+        const summaryItem = document.createElement('div');
+        summaryItem.className = 'summary-item';
+        summaryItem.innerHTML = `${food.name} (${food.brand})`;
+        triggeringSummary.appendChild(summaryItem);
+      });
+      
+      safeSummary.innerHTML = '';
+      mobileSafeFoods.forEach(food => {
+        const summaryItem = document.createElement('div');
+        summaryItem.className = 'summary-item';
+        summaryItem.innerHTML = `${food.name} (${food.brand})`;
+        safeSummary.appendChild(summaryItem);
+      });
+    }
+
+    async function buildMobileComparison() {
+      try {
+        console.log('Building mobile comparison...');
+        
+        // Mark mobile app as completed
+        localStorage.setItem('mobileAppCompleted', 'true');
+        
+        // Populate the main website with selected foods
+        await populateMainWebsiteWithMobileData();
+        console.log('Successfully populated main website with mobile data');
+        
+        // Hide mobile app flow
+        document.getElementById('mobileAppFlow').style.display = 'none';
+        document.body.style.overflow = 'auto';
+        
+        // Scroll to comparison table
+        document.getElementById('compareTable').scrollIntoView({ behavior: 'smooth', block: 'start' });
+        
+        // Auto-run comparison
+        setTimeout(() => {
+          const submitBtn = document.querySelector('#compare button[type="submit"]');
+          if (submitBtn) {
+            console.log('Auto-clicking submit button...');
+            submitBtn.click();
+          } else {
+            console.error('Submit button not found!');
+          }
+        }, 1000);
+        
+      } catch (error) {
+        console.error('Error in buildMobileComparison:', error);
+        alert('Error building comparison. Please try again.');
+      }
+    }
+
+    async function populateMainWebsiteWithMobileData() {
+      console.log('Populating main website with mobile data...');
+      console.log('Triggering foods:', mobileTriggeringFoods);
+      console.log('Safe foods:', mobileSafeFoods);
+      
+      // Clear existing foods
+      const triggeringContainer = document.getElementById('triggeringFoods');
+      const safeContainer = document.getElementById('safeFoods');
+      
+      if (!triggeringContainer || !safeContainer) {
+        console.error('Could not find triggering or safe foods containers');
+        return;
+      }
+      
+      // Remove all existing food entries except the first one
+      const triggeringEntries = triggeringContainer.querySelectorAll('.foodEntry');
+      const safeEntries = safeContainer.querySelectorAll('.foodEntry');
+      
+      triggeringEntries.forEach((entry, index) => {
+        if (index > 0) entry.remove();
+      });
+      
+      safeEntries.forEach((entry, index) => {
+        if (index > 0) entry.remove();
+      });
+      
+      // Populate triggering foods
+      mobileTriggeringFoods.forEach((food, index) => {
+        if (index === 0) {
+          // Use first existing entry
+          const firstEntry = triggeringEntries[0];
+          const foodSelect = firstEntry.querySelector('select');
+          const ingredientsTextarea = firstEntry.querySelector('textarea');
+          
+          // Set custom option for this food
+          const customOption = document.createElement('option');
+          customOption.value = 'custom';
+          customOption.textContent = `Custom: ${food.name}`;
+          foodSelect.appendChild(customOption);
+          foodSelect.value = 'custom';
+          
+          ingredientsTextarea.value = food.ingredients;
+        } else {
+          // Add new entries for additional foods
+          addNewFood('triggeringFoods');
+          const entries = triggeringContainer.querySelectorAll('.foodEntry');
+          const lastEntry = entries[entries.length - 1];
+          const foodSelect = lastEntry.querySelector('select');
+          const ingredientsTextarea = lastEntry.querySelector('textarea');
+          
+          const customOption = document.createElement('option');
+          customOption.value = 'custom';
+          customOption.textContent = `Custom: ${food.name}`;
+          foodSelect.appendChild(customOption);
+          foodSelect.value = 'custom';
+          
+          ingredientsTextarea.value = food.ingredients;
+        }
+      });
+      
+      // Populate safe foods
+      mobileSafeFoods.forEach((food, index) => {
+        if (index === 0) {
+          // Use first existing entry
+          const firstEntry = safeEntries[0];
+          const foodSelect = firstEntry.querySelector('select');
+          const ingredientsTextarea = firstEntry.querySelector('textarea');
+          
+          const customOption = document.createElement('option');
+          customOption.value = 'custom';
+          customOption.textContent = `Custom: ${food.name}`;
+          foodSelect.appendChild(customOption);
+          foodSelect.value = 'custom';
+          
+          ingredientsTextarea.value = food.ingredients;
+        } else {
+          // Add new entries for additional foods
+          addNewFood('safeFoods');
+          const entries = safeContainer.querySelectorAll('.foodEntry');
+          const lastEntry = entries[entries.length - 1];
+          const foodSelect = lastEntry.querySelector('select');
+          const ingredientsTextarea = lastEntry.querySelector('textarea');
+          
+          const customOption = document.createElement('option');
+          customOption.value = 'custom';
+          customOption.textContent = `Custom: ${food.name}`;
+          foodSelect.appendChild(customOption);
+          foodSelect.value = 'custom';
+          
+          ingredientsTextarea.value = food.ingredients;
+        }
+      });
+    }
+
+    // Initialize page on load
+    document.addEventListener('DOMContentLoaded', function() {
+      // Auto-start mobile app flow on mobile devices
+      autoStartMobileAppFlow();
+    });
 
 
 
