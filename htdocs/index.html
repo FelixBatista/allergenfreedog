@@ -1949,14 +1949,18 @@
       const allFoods = [...triggering, ...safe];
       const tbl = document.getElementById('compareTable');
       
-      // Remove any existing mobile legend before switching views
-      const existingLegend = document.querySelector('.mobile-legend');
-      if (existingLegend) {
-        existingLegend.remove();
-      }
-      
       // Check if we're on mobile
       const isMobile = window.innerWidth <= 768;
+      
+      // Only remove mobile legend if we're switching from mobile to desktop view
+      const wasMobile = lastComparison && window.innerWidth <= 768;
+      
+      if (wasMobile && !isMobile) {
+        const existingLegend = document.querySelector('.mobile-legend');
+        if (existingLegend) {
+          existingLegend.remove();
+        }
+      }
       
       if (isMobile) {
         displayMobileComparisonTable(comparisonData, triggering, safe, prefs);
@@ -1974,26 +1978,35 @@
 
     // Handle window resize to switch between mobile and desktop table views
     let resizeTimeout;
+    let lastWindowWidth = window.innerWidth;
     window.addEventListener('resize', () => {
       clearTimeout(resizeTimeout);
       resizeTimeout = setTimeout(() => {
-        // Only re-render if we have comparison data and the view type changed
+        // Only re-render if we have comparison data and the view type actually changed
         if (lastComparison) {
-          const wasMobile = window.innerWidth <= 768;
-          const isMobile = window.innerWidth <= 768;
+          const currentWidth = window.innerWidth;
+          const wasMobile = lastWindowWidth <= 768;
+          const isMobile = currentWidth <= 768;
           
-          // Remove existing mobile legend if it exists
-          const existingLegend = document.querySelector('.mobile-legend');
-          if (existingLegend) {
-            existingLegend.remove();
+          // Only re-render if we're actually switching between mobile and desktop
+          if (wasMobile !== isMobile) {
+            // Remove existing mobile legend only when switching from mobile to desktop
+            if (wasMobile && !isMobile) {
+              const existingLegend = document.querySelector('.mobile-legend');
+              if (existingLegend) {
+                existingLegend.remove();
+              }
+            }
+            
+            // Re-render the table with the new layout
+            displayComparisonTable(lastComparison.comparisonData, lastComparison.triggering, lastComparison.safe, {
+              noGluten: document.getElementById('noGluten').checked,
+              noPoultry: document.getElementById('noPoultry').checked,
+              hydrolysedOk: document.getElementById('hydrolysedOk').checked
+            });
+            
+            lastWindowWidth = currentWidth;
           }
-          
-          // Re-render the table with the new layout
-          displayComparisonTable(lastComparison.comparisonData, lastComparison.triggering, lastComparison.safe, {
-            noGluten: document.getElementById('noGluten').checked,
-            noPoultry: document.getElementById('noPoultry').checked,
-            hydrolysedOk: document.getElementById('hydrolysedOk').checked
-          });
         }
       }, 250); // Debounce resize events
     });
@@ -2063,28 +2076,31 @@
       
       const body = tbl.querySelector('tbody');
       
-      // Create legend for mobile
-      const legendHtml = `
-        <div class="mobile-legend" style="margin-bottom: 16px; padding: 12px; background: var(--bg); border-radius: 8px; border: 1px solid #e9e1d7;">
-          <h4 style="margin: 0 0 8px 0; font-size: 14px; color: var(--ink);">📱 Quick Guide:</h4>
-          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 6px; font-size: 11px; margin-bottom: 8px;">
-            <div><span class="pill danger" style="font-size: 9px; padding: 1px 3px;">DANGER</span> High risk</div>
-            <div><span class="pill warn" style="font-size: 9px; padding: 1px 3px;">WARN</span> Medium risk</div>
-            <div><span class="pill ok" style="font-size: 9px; padding: 1px 3px;">OK</span> Low risk</div>
-            <div><span class="pill danger" style="font-size: 9px; padding: 1px 3px;">⚠️</span> Non-similar</div>
+      // Create legend for mobile only if it doesn't exist
+      const existingLegend = document.querySelector('.mobile-legend');
+      if (!existingLegend) {
+        const legendHtml = `
+          <div class="mobile-legend" style="margin-bottom: 16px; padding: 12px; background: var(--bg); border-radius: 8px; border: 1px solid #e9e1d7;">
+            <h4 style="margin: 0 0 8px 0; font-size: 14px; color: var(--ink);">📱 Quick Guide:</h4>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 6px; font-size: 11px; margin-bottom: 8px;">
+              <div><span class="pill danger" style="font-size: 9px; padding: 1px 3px;">DANGER</span> High risk</div>
+              <div><span class="pill warn" style="font-size: 9px; padding: 1px 3px;">WARN</span> Medium risk</div>
+              <div><span class="pill ok" style="font-size: 9px; padding: 1px 3px;">OK</span> Low risk</div>
+              <div><span class="pill danger" style="font-size: 9px; padding: 1px 3px;">⚠️</span> Non-similar</div>
+            </div>
+            <div style="font-size: 11px; color: var(--muted); margin-bottom: 4px;">
+              <strong>Colored Balls in "In Foods" column:</strong>
+            </div>
+            <div style="font-size: 11px; color: var(--ink);">
+              <span style="color: #ff4757;">🔴</span> = Found in <strong>triggering</strong> foods (number shows how many)<br>
+              <span style="color: #2ed573;">🟢</span> = Found in <strong>safe</strong> foods (number shows how many)
+            </div>
           </div>
-          <div style="font-size: 11px; color: var(--muted); margin-bottom: 4px;">
-            <strong>Colored Balls in "In Foods" column:</strong>
-          </div>
-          <div style="font-size: 11px; color: var(--ink);">
-            <span style="color: #ff4757;">🔴</span> = Found in <strong>triggering</strong> foods (number shows how many)<br>
-            <span style="color: #2ed573;">🟢</span> = Found in <strong>safe</strong> foods (number shows how many)
-          </div>
-        </div>
-      `;
-      
-      // Insert legend before table
-      tbl.insertAdjacentHTML('beforebegin', legendHtml);
+        `;
+        
+        // Insert legend before table
+        tbl.insertAdjacentHTML('beforebegin', legendHtml);
+      }
       
       comparisonData.forEach(rowData => {
         const name = rowData.ingredient;
@@ -2377,9 +2393,10 @@
       auth.getRedirectResult().then((result) => {
         if (result.credential) {
           console.log('Redirect sign-in successful:', result);
-          // Close both dialogs
+          // Close both dialogs and restore scrolling
           document.getElementById('loginDialog').style.display = 'none';
           document.getElementById('saveComparisonDialog').style.display = 'none';
+          document.body.style.overflow = 'auto';
         }
       }).catch((error) => {
         console.error('Redirect sign-in error:', error);
@@ -2403,6 +2420,9 @@
       if (isLoggedIn) {
         loginBtn.style.display = 'none';
         userInfo.style.display = 'flex';
+        
+        // Restore scrolling when user logs in successfully
+        document.body.style.overflow = 'auto';
         
         // Update user name with proper truncation
         const displayName = gisUser.name || 'User';
@@ -2520,6 +2540,7 @@
       // Close dialogs
       document.getElementById('closeLoginDialog').addEventListener('click', () => {
         document.getElementById('loginDialog').style.display = 'none';
+        document.body.style.overflow = 'auto';
       });
 
       document.getElementById('closeSaveComparisonDialog').addEventListener('click', () => {
@@ -2679,6 +2700,7 @@
       document.getElementById('loginDialog').addEventListener('click', (e) => {
         if (e.target.id === 'loginDialog') {
           document.getElementById('loginDialog').style.display = 'none';
+          document.body.style.overflow = 'auto';
         }
       });
 
@@ -2740,9 +2762,10 @@
         // Try popup first, fallback to redirect if blocked
         auth.signInWithPopup(provider).then((result) => {
           console.log('Sign-in successful:', result);
-          // Close both dialogs
+          // Close both dialogs and restore scrolling
           document.getElementById('loginDialog').style.display = 'none';
           document.getElementById('saveComparisonDialog').style.display = 'none';
+          document.body.style.overflow = 'auto';
         }).catch((error) => {
           console.error('Sign-in error details:', error);
           console.error('Error code:', error.code);
@@ -3458,6 +3481,15 @@
         console.log('Starting mobile app flow...');
         document.getElementById('mobileAppFlow').style.display = 'block';
         document.body.style.overflow = 'hidden';
+        
+        // Hide login button if user is already logged in
+        const loginButton = document.querySelector('#welcomeStep .mobile-dialog-footer:last-child');
+        if (auth.currentUser && loginButton) {
+          loginButton.style.display = 'none';
+        } else if (loginButton) {
+          loginButton.style.display = 'block';
+        }
+        
         loadMobileFoodCatalog();
       } else {
         console.log('Mobile app flow only available on mobile devices');
@@ -3466,11 +3498,18 @@
     }
 
     function autoStartMobileAppFlow() {
-      // Always show mobile app flow on mobile devices, regardless of previous usage
-      if (window.innerWidth <= 768) {
+      // Only show mobile app flow on mobile devices if user is not logged in
+      if (window.innerWidth <= 768 && !auth.currentUser) {
         console.log('Auto-starting mobile app flow for mobile device...');
         document.getElementById('mobileAppFlow').style.display = 'block';
         document.body.style.overflow = 'hidden';
+        
+        // Show login button since user is not logged in
+        const loginButton = document.querySelector('#welcomeStep .mobile-dialog-footer:last-child');
+        if (loginButton) {
+          loginButton.style.display = 'block';
+        }
+        
         loadMobileFoodCatalog();
       }
     }
@@ -3478,10 +3517,13 @@
     function skipTutorialAndLogin() {
       // Hide mobile app flow
       document.getElementById('mobileAppFlow').style.display = 'none';
-      document.body.style.overflow = 'auto';
       
-      // Show login dialog
-      document.getElementById('loginModal').style.display = 'flex';
+      // Show login dialog and prevent background scrolling
+      document.getElementById('loginDialog').style.display = 'flex';
+      document.body.style.overflow = 'hidden';
+      
+      // Initialize Google sign-in button
+      initializeGoogleSignIn('googleSignInButton');
     }
 
     function nextMobileStep() {
