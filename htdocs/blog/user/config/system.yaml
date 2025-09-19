@@ -1,0 +1,25 @@
+home:
+  alias: '/blog'
+
+pages:
+  theme: lingonberry
+  process:
+    markdown: true
+    twig: false
+  markdown:
+    extra: true
+
+# Set the correct base URL for the blog
+absolute_urls: true
+base_url: 'https://dogallergycheck.com/blog'
+
+# Configure paths
+paths:
+  cache: 'cache'
+  log: 'logs'
+  tmp: 'tmp'
+  images: 'images'
+  pages: 'user/pages'
+  plugins: 'user/plugins'
+  themes: 'user/themes'
+  user: 'user'

@@ -23,6 +23,14 @@ Header always set X-XSS-Protection "1; mode=block"
 # Prevent directory listing
 Options -Indexes
 
+# Handle blog requests - route to Grav installation
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule ^blog/?$ blog/index.php [L]
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule ^blog/(.*)$ blog/$1 [L]
+
 # Handle API requests
 RewriteCond %{REQUEST_FILENAME} !-f
 RewriteCond %{REQUEST_FILENAME} !-d

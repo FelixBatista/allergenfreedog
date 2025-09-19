@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="{{ grav.language.getActive ?: grav.config.site.default_lang }}">
+<head>
+    {% block head %}
+      <meta charset="utf-8" />
+      <title>{% if header.title %}{{ header.title }} | {% endif %}{{ site.title }}</title>
+      {% include 'partials/metadata.html.twig' %}
+      <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no">
+      <link rel="icon" type="image/svg+xml" href="{{ theme_url }}/images/favicon.svg" />
+      
+      <!-- Resource Hints for Performance -->
+      <link rel="dns-prefetch" href="//fonts.googleapis.com">
+      <link rel="dns-prefetch" href="//fonts.gstatic.com">
+      <link rel="dns-prefetch" href="//unpkg.com">
+      <link rel="preconnect" href="https://www.dogallergycheck.com">
+      
+      <!-- Critical CSS for LCP optimization -->
+      <style>
+        /* Critical above-the-fold styles */
+        .nav { position: sticky; top: 0; background: #fbf6ef/.8; backdrop-filter: blur(8px); border-bottom: 1px solid #e9e1d7; z-index: 5; }
+        .nav-container { max-width: 1100px; margin: 0 auto; padding: 24px; display: flex; align-items: center; gap: 16px; justify-content: space-between; }
+        .nav-brand { display: flex; align-items: center; gap: 12px; font-weight: 800; font-size: 1.25rem; color: #274642; text-decoration: none; transition: all 0.3s ease; }
+        .nav-brand:hover { color: #274642; text-decoration: none; }
+        .nav-brand svg { width: 28px; height: 28px; }
+        body { margin: 0; padding: 0; background: #fbf6ef; color: #274642; font: 16px/1.4 system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, "Helvetica Neue", Arial, sans-serif; }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+      </style>
+
+      <!-- Google Fonts - Optimized Loading -->
+      <link rel="preconnect" href="https://fonts.googleapis.com">
+      <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+      <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
+      <noscript><link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet"></noscript>
+      
+      <!-- AOS Animation Library - Deferred Loading -->
+      <link rel="preload" href="https://unpkg.com/aos@2.3.1/dist/aos.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+      <noscript><link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet"></noscript>
+      
+      <!-- Feather Icons - Deferred Loading -->
+      <script>
+        // Defer feather icons loading
+        window.addEventListener('DOMContentLoaded', function() {
+          var script = document.createElement('script');
+          script.src = 'https://unpkg.com/feather-icons';
+          script.onload = function() { feather.replace(); };
+          document.head.appendChild(script);
+        });
+      </script>
+
+      {% block stylesheets %}
+          {% do assets.addCss('theme://css/custom.css') %}
+      {% endblock %}
+
+      {% block javascripts %}
+          {% do assets.add('jquery',101) %}
+      {% endblock %}
+
+      {% block assets deferred %}
+        {{ assets.css()|raw }}
+        {{ assets.js()|raw }}
+      {% endblock %}
+
+    {% endblock head %}
+</head>
+<body class="{{ page.header.body_classes }}">
+  {% block navigation %}
+      {% include 'partials/navigation.html.twig' %}
+  {% endblock %}
+
+  {% block content %}{% endblock %}
+
+  {% block footer %}
+  {% include 'partials/footer.html.twig' %}
+  {% endblock %}
+
+  <!-- AOS Animation Script - Deferred Loading -->
+  <script>
+    // Defer AOS loading to improve LCP
+    window.addEventListener('load', function() {
+      var script = document.createElement('script');
+      script.src = 'https://unpkg.com/aos@2.3.1/dist/aos.js';
+      script.onload = function() {
+        AOS.init({
+          duration: 800,
+          easing: 'ease-in-out',
+          once: true
+        });
+      };
+      document.head.appendChild(script);
+    });
+  </script>
+
+  {% block bottom %}
+      {{ assets.js('bottom')|raw }}
+  {% endblock %}
+</body>
+</html>

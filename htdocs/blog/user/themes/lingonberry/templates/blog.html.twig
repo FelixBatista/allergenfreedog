@@ -1,0 +1,138 @@
+{% embed 'partials/base.html.twig' %}
+
+    {% set collection = page.collection() %}
+    {% set base_url = page.url %}
+
+    {% if base_url == '/' %}
+    {% set base_url = '' %}
+    {% endif %}
+
+    {% if base_url == base_url_relative %}
+    {% set feed_url = base_url~'/'~page.slug %}
+    {% endif  %}
+
+    {% block content %}
+    <!-- Featured Posts -->
+    <section class="section section-white">
+        <div class="content">
+            <h2 class="section-title" data-aos="fade-up">Featured Posts</h2>
+            <div class="blog-grid">
+                {% for child in collection|slice(0, 6) %}
+                <div class="blog-card" data-aos="fade-up" data-aos-delay="{{ loop.index * 100 }}">
+                    <div class="blog-card-image">
+                        {% include 'partials/image_placeholder.html.twig' with {'page': child, 'width': 400, 'height': 300, 'alt_text': child.title} %}
+                    </div>
+                    <div class="blog-card-content">
+                        <div class="blog-card-meta">
+                            <span>{{ child.date|date('M j, Y') }}</span>
+                            <span class="separator">•</span>
+                            <span>{{ (child.content|length / 200)|round }} min read</span>
+                        </div>
+                        <h3 class="blog-card-title">
+                            <a href="{{ child.url }}">{{ child.title }}</a>
+                        </h3>
+                        <p class="blog-card-excerpt">
+                            {{ child.summary|striptags|slice(0, 120) }}...
+                        </p>
+                        <a href="{{ child.url }}" class="blog-card-link">
+                            Read more <i data-feather="arrow-right"></i>
+                        </a>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </section>
+
+    <!-- Categories Section -->
+    <section class="section section-gray">
+        <div class="content">
+            <h2 class="section-title" data-aos="fade-up">Browse Categories</h2>
+            <div class="categories-grid">
+                <a href="#symptoms" class="category-card" data-aos="fade-up" data-aos-delay="100">
+                    <div class="category-icon">
+                        <i data-feather="activity"></i>
+                    </div>
+                    <span class="category-name">Symptoms</span>
+                </a>
+                <a href="#food-allergies" class="category-card" data-aos="fade-up" data-aos-delay="150">
+                    <div class="category-icon">
+                        <i data-feather="droplet"></i>
+                    </div>
+                    <span class="category-name">Food Allergies</span>
+                </a>
+                <a href="#environmental" class="category-card" data-aos="fade-up" data-aos-delay="200">
+                    <div class="category-icon">
+                        <i data-feather="wind"></i>
+                    </div>
+                    <span class="category-name">Environmental</span>
+                </a>
+                <a href="#prevention" class="category-card" data-aos="fade-up" data-aos-delay="250">
+                    <div class="category-icon">
+                        <i data-feather="shield"></i>
+                    </div>
+                    <span class="category-name">Prevention</span>
+                </a>
+                <a href="#treatments" class="category-card" data-aos="fade-up" data-aos-delay="300">
+                    <div class="category-icon">
+                        <i data-feather="heart"></i>
+                    </div>
+                    <span class="category-name">Treatments</span>
+                </a>
+                <a href="#research" class="category-card" data-aos="fade-up" data-aos-delay="350">
+                    <div class="category-icon">
+                        <i data-feather="clipboard"></i>
+                    </div>
+                    <span class="category-name">Research</span>
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Popular Posts -->
+    <section class="section section-white">
+        <div class="content">
+            <h2 class="section-title" data-aos="fade-up">Popular Posts</h2>
+            <div class="popular-posts">
+                {% for child in collection|slice(0, 2) %}
+                <div class="popular-post" data-aos="fade-up" data-aos-delay="{{ loop.index * 100 }}">
+                    <div class="popular-post-image">
+                        {% include 'partials/image_placeholder.html.twig' with {'page': child, 'width': 300, 'height': 200, 'alt_text': child.title, 'class': 'popular-post-img'} %}
+                    </div>
+                    <div class="popular-post-content">
+                        <div class="blog-card-meta">
+                            <span>{{ child.date|date('M j, Y') }}</span>
+                            <span class="separator">•</span>
+                            <span>{{ (child.content|length / 200)|round }} min read</span>
+                        </div>
+                        <h3 class="blog-card-title">
+                            <a href="{{ child.url }}">{{ child.title }}</a>
+                        </h3>
+                        <p class="blog-card-excerpt">
+                            {{ child.summary|striptags|slice(0, 150) }}...
+                        </p>
+                        <a href="{{ child.url }}" class="blog-card-link">
+                            Read more <i data-feather="arrow-right"></i>
+                        </a>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </section>
+
+    <!-- Newsletter -->
+    <section class="newsletter">
+        <div class="content" data-aos="fade-up">
+            <h2>Get Allergy Updates</h2>
+            <p>Receive the latest research and treatment options for your dog's allergies.</p>
+            <form class="newsletter-form">
+                <input type="email" placeholder="Your email address" class="newsletter-input">
+                <button type="submit" class="newsletter-button">Subscribe</button>
+            </form>
+        </div>
+    </section>
+
+    {% endblock %}
+
+{% endembed %}
