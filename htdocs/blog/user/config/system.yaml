@@ -23,3 +23,9 @@ paths:
   plugins: 'user/plugins'
   themes: 'user/themes'
   user: 'user'
+
+# Config to make it work on infinity free
+http:
+  method: 'fopen'
+gpm:
+  method: 'fopen'
