@@ -49,7 +49,7 @@
     .btn.ghost{background:transparent;border:2px solid #c6dacd;color:var(--muted)}
     .btn.primary:hover{transform:translateY(-2px);box-shadow:0 6px 20px rgba(255,159,104,0.4);color:#fff}
     .btn.ghost:hover{border-color:var(--primary);color:var(--ink)}
-
+    
     @keyframes fadeInUp{from{opacity:0;transform:translateY(30px)}to{opacity:1;transform:translateY(0)}}
     @keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.02)}}
 
@@ -80,6 +80,8 @@
     .test-badge.featured{background:linear-gradient(135deg, var(--primary) 0%, var(--ok) 100%)}
     
     .test-name{font-size:1.4rem;font-weight:800;color:var(--ink);margin:12px 0;line-height:1.2}
+    .test-image{width:100%;height:200px;object-fit:contain;border-radius:12px;margin:16px 0;background:#f8f9fa;border:2px solid #e9ecef;transition:all 0.3s ease}
+    .test-image:hover{transform:scale(1.02);box-shadow:0 8px 25px rgba(0,0,0,0.1)}
     .test-description{color:var(--muted);margin:16px 0;line-height:1.6;font-size:1.05rem}
     
     .test-features{list-style:none;padding:0;margin:20px 0}
@@ -92,7 +94,7 @@
     .coupon-discount{font-size:1.4rem;font-weight:900;margin-bottom:8px;text-shadow:0 2px 4px rgba(0,0,0,0.2)}
     .coupon-note{font-size:0.9rem;opacity:0.9;margin-top:8px}
     
-    .cta-button{background:linear-gradient(135deg, var(--accent) 0%, #ff7a4d 100%);color:white;padding:16px 32px;border-radius:30px;text-decoration:none;font-weight:700;display:inline-block;margin:20px 0;transition:all 0.3s ease;font-size:1.1rem;box-shadow:0 6px 20px rgba(255,159,104,0.3);position:relative;overflow:hidden}
+    .cta-button{background:linear-gradient(135deg, var(--accent) 0%, #ff7a4d 100%);color:white;padding:16px 32px;border-radius:30px;text-decoration:none;font-weight:700;display:block;margin:20px 0;transition:all 0.3s ease;font-size:1.1rem;box-shadow:0 6px 20px rgba(255,159,104,0.3);position:relative;overflow:hidden;width:100%;text-align:center}
     .cta-button::before{content:'';position:absolute;top:0;left:-100%;width:100%;height:100%;background:linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);transition:left 0.5s}
     .cta-button:hover::before{left:100%}
     .cta-button:hover{transform:translateY(-3px);box-shadow:0 8px 25px rgba(255,159,104,0.4);color:white;text-decoration:none}
@@ -235,13 +237,13 @@
               </div>
             </div>
             <h3 class="test-name">UCARI Pet Testing Kit</h3>
+            <img src="images/products/ucari-kit.jpg" alt="UCARI Pet Testing Kit - Comprehensive Dog Allergy Test" class="test-image" onerror="this.style.display='none'">
             <p class="test-description">The most comprehensive test available, testing for 1000+ allergens. Recommended by veterinarians for its accuracy and detailed reporting.</p>
             
             <ul class="test-features">
               <li>Tests for 1000+ possible intolerances and nutritional imbalances</li>
               <li>Uses hair sample - absolutely no stress for your pet</li>
               <li>Results in just 2 days after sample received</li>
-              <li>Doctor Recommended & Veterinarian Approved</li>
               <li>Comprehensive detailed report with action plan</li>
               <li>30-day money-back guarantee from manufacturer</li>
             </ul>
@@ -268,6 +270,7 @@
               </div>
             </div>
             <h3 class="test-name">My Pet Health Store</h3>
+            <img src="images/products/mypethealth-kit.jpg" alt="My Pet Health Store - Dog Allergy Test Kit" class="test-image" onerror="this.style.display='none'">
             <p class="test-description">Perfect balance of comprehensive testing and affordability. Tests for 550+ items with detailed, easy-to-understand results.</p>
             
             <ul class="test-features">
@@ -301,6 +304,7 @@
               </div>
             </div>
             <h3 class="test-name">5Strands Pet Test</h3>
+            <img src="images/products/5strands-kit.jpg" alt="5Strands Pet Test - Bioresonance Dog Allergy Test" class="test-image" onerror="this.style.display='none'">
             <p class="test-description">Revolutionary bioresonance technology identifies temporary imbalances causing your dog's discomfort. Used by over 100,000 pets.</p>
             
             <ul class="test-features">
@@ -334,6 +338,7 @@
               </div>
             </div>
             <h3 class="test-name">Easy DNA Pet Test</h3>
+            <img src="images/products/easydna-kit.jpg" alt="Easy DNA Pet Test - Genetic Dog Allergy Test" class="test-image" onerror="this.style.display='none'">
             <p class="test-description">18 years of experience in genetic testing. Simple cheek swab test with comprehensive food and environmental allergen analysis.</p>
             
             <ul class="test-features">
