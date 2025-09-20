@@ -1,0 +1,28 @@
+{# Image Placeholder Macro #}
+{# Usage: {% include 'partials/image_placeholder.html.twig' with {'page': page, 'width': 400, 'height': 300, 'class': 'custom-class'} %} #}
+
+{% set width = width|default(400) %}
+{% set height = height|default(300) %}
+{% set class = class|default('') %}
+{% set alt_text = alt_text|default(page.title|default('Blog Post')) %}
+
+{% if page.media.images|length > 0 %}
+    {% set first_image = page.media.images|first %}
+    <img src="{{ first_image.cropZoom(width, height).url }}" 
+         alt="{{ alt_text }}" 
+         class="{{ class }}"
+         style="width: 100%; height: 100%; object-fit: cover; border-radius: 16px 16px 0 0;">
+{% else %}
+    <div class="placeholder-image {{ class }}" 
+         style="background: linear-gradient(135deg, var(--primary), var(--accent)); 
+                display: flex; 
+                align-items: center; 
+                justify-content: center; 
+                color: white; 
+                font-size: {{ (width / 8)|round }}px; 
+                width: 100%; 
+                height: 100%; 
+                border-radius: 16px 16px 0 0;">
+        🐕
+    </div>
+{% endif %}
