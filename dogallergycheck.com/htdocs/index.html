@@ -2394,6 +2394,9 @@
           currentDogId = null;
           userDogs = [];
           updateAuthUI(false);
+          
+          // Auto-start mobile app flow for non-logged-in users on mobile devices
+          autoStartMobileAppFlow();
         }
       });
 
@@ -3521,8 +3524,8 @@
     }
 
     function autoStartMobileAppFlow() {
-      // Only show mobile app flow on mobile devices if user is not logged in
-      if (window.innerWidth <= 768 && !auth.currentUser) {
+      // Only show mobile app flow on mobile devices if user is not logged in and hasn't completed it before
+      if (window.innerWidth <= 768 && !auth.currentUser && !localStorage.getItem('mobileAppCompleted')) {
         console.log('Auto-starting mobile app flow for mobile device...');
         document.getElementById('mobileAppFlow').style.display = 'block';
         document.body.style.overflow = 'hidden';
@@ -3889,10 +3892,7 @@
     }
 
     // Initialize page on load
-    document.addEventListener('DOMContentLoaded', function() {
-      // Auto-start mobile app flow on mobile devices
-      autoStartMobileAppFlow();
-    });
+    // Note: Mobile app flow auto-start is now handled in the auth state change listener
 
 
 
