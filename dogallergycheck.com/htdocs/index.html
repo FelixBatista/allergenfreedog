@@ -1369,7 +1369,8 @@
       try {
         await Promise.all([
           loadFoodCatalog(),
-          loadIngredientMaster()
+          loadIngredientMaster(),
+          loadSafeFoodProducts()
         ]);
   // populate brand filter then initialize entries
   populateBrandFilter();
@@ -3178,51 +3179,38 @@
       }
     }
 
-    // Safe Food Suggestions - Using real food catalog data
-    const safeFoodProducts = [
-      {
-        id: 'royal-canin-maxi-adult',
-        name: 'Royal Canin MAXI Adult 5+ Large breed',
-        brand: 'Royal Canin',
-        asin: 'B00CNVBCLA',
-        ingredients: 'dehydrated poultry proteins, animal fats, maize, wheat meal, wheat flour, barley, maize gluten, wheat gluten, hydrolysed animal proteins, beet pulp, minerals, fish oil, soya oil, yeast products, psyllium husks and seeds, fructo-oligosaccharides, algal oil (schizochytrium), glucosamine, hydrolysed cartilage'
-      },
-      {
-        id: 'hills-science-diet-chicken-barley',
-        name: 'Hill\'s Science Diet Adult Chicken & Barley Recipe',
-        brand: 'Hill\'s Science Diet',
-        asin: 'B07L5FF4W3',
-        ingredients: 'chicken, brown rice, oats, maize, egg, pea, pea protein, natural flavor, corn gluten meal, linseed, chicken fat, beet pulp, minerals'
-      },
-      {
-        id: 'orijen-original',
-        name: 'Orijen Original',
-        brand: 'Orijen',
-        asin: 'B01I3K10ZC',
-        ingredients: 'fresh chicken, fresh turkey, fresh eggs, fresh chicken liver, whole herring, whole flounder, turkey liver, chicken necks, chicken heart, turkey heart, dehydrated chicken, dehydrated turkey, dehydrated mackerel, dehydrated sardine, dehydrated herring, red lentils, green lentils, green peas, lentil fibre, chickpeas, yellow peas, pinto beans, navy beans, herring oil, chicken fat, chicken cartilage, freeze-dried chicken liver, freeze-dried turkey liver, pumpkin, butternut squash, zucchini, parsnips, carrots, apples, pears, kale, spinach, beet greens, turnip greens, kelp, cranberries, blueberries, saskatoon berries, chicory root, turmeric, milk thistle, burdock root, lavender, marshmallow root, rosehips, minerals'
-      },
-      {
-        id: 'blue-buffalo-life-protection',
-        name: 'Blue Buffalo Life Protection Adult Chicken & Brown Rice',
-        brand: 'Blue Buffalo',
-        asin: null, // No ASIN in database
-        ingredients: 'deboned chicken, chicken meal, brown rice, oatmeal, barley, pea, chicken fat (mixed tocopherols), dried tomato pomace, natural flavor, pea protein, linseed, salt, alfalfa, pea fiber, calcium carbonate, potassium chloride, DL-methionine, carrots, blueberries, cranberries, kelp, parsley, turmeric, yeast, glucosamine, taurine, L-carnitine, vitamins and minerals'
-      },
-      {
-        id: 'wellness-complete-health',
-        name: 'Wellness Complete Health Adult Deboned Chicken & Oatmeal',
-        brand: 'Wellness',
-        asin: null, // No ASIN in database
-        ingredients: 'deboned chicken, chicken meal, oatmeal, barley, brown rice, pea, beet pulp, chicken fat, linseed, natural flavor, chicory root, taurine, spinach, broccoli, carrots, parsley, apples, blueberries, kale, mixed tocopherols, glucosamine, yucca schidigera, probiotics, minerals'
-      },
-      {
-        id: 'canagan-free-range-chicken',
-        name: 'Canagan Free-Range Chicken',
-        brand: 'Canagan',
-        asin: null, // No ASIN in database
-        ingredients: 'freshly prepared free-range chicken, dried chicken, sweet potato, pea, potato, chicken fat, alfalfa, dried egg, chicken gravy, salmon oil, minerals, glucosamine, MSM, apple, carrot, spinach, psyllium, seaweed, fructo-oligosaccharides, chondroitin, camomile, peppermint, marigold, cranberry, aniseed, fenugreek'
+    // Safe Food Suggestions - Will be loaded from database
+    let safeFoodProducts = [];
+
+    // Function to load safe food products from database
+    async function loadSafeFoodProducts() {
+      try {
+        const response = await fetch('api/food_catalog.php');
+        const result = await response.json();
+        
+        if (result.success && result.data) {
+          // Map the database data to the expected format
+          safeFoodProducts = result.data.map(food => {
+            return {
+              id: food.id,
+              name: food.name,
+              brand: food.brand,
+              ingredients: food.ingredients,
+              picture_url: food.picture_url,
+              asin: food.amazon_asin || null
+            };
+          });
+          
+          console.log('Loaded', safeFoodProducts.length, 'safe food products from database');
+        } else {
+          throw new Error('Failed to load safe food products');
+        }
+      } catch (error) {
+        console.error('Error loading safe food products:', error);
+        // Fallback to empty array if API fails
+        safeFoodProducts = [];
       }
-    ];
+    }
 
     // Function to generate Amazon affiliate link
     function generateAffiliateLink(product) {

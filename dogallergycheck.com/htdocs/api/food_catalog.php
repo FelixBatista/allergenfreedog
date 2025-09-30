@@ -21,7 +21,7 @@ try {
     switch ($_SERVER['REQUEST_METHOD']) {
         case 'GET':
             // Get food catalog
-            $sql = "SELECT id, name, brand, ingredients, is_sample, picture_url FROM food_catalog ORDER BY name";
+            $sql = "SELECT id, name, brand, ingredients, is_sample, amazon_asin, picture_url FROM food_catalog ORDER BY name";
             $foods = $db->fetchAll($sql);
             
             echo json_encode([

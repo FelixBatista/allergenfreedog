@@ -30,6 +30,7 @@ CREATE TABLE IF NOT EXISTS food_catalog (
     ingredients TEXT NOT NULL,
     is_sample BOOLEAN DEFAULT FALSE,
     picture_url VARCHAR(500) NULL,
+    amazon_asin VARCHAR(20) NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 );
@@ -194,7 +195,7 @@ INSERT INTO ingredient_master (name, aliases, tags, note, risk_level) VALUES
 ('coconut', '["dried coconut"]', '[]', 'Fruit/fat source (non-oil)', 'safe');
 
 -- Insert sample food catalog
-INSERT INTO food_catalog (name, brand, ingredients, is_sample, ASIN) VALUES
+INSERT INTO food_catalog (name, brand, ingredients, is_sample, amazon_asin) VALUES
 ('Insect & Pea', 'BRIT', 'dehydrated insect, yellow peas, dried apple pulp, coconut oil, pea protein, linseed, calcium carbonate, dried algae (schizochytrium), pea flour, hydrolyzed yeasts, yeast extract, beta-glucans, dried sea buckthorn, fructo-oligosaccharides, mojave yucca, lactobacillus helveticus, minerals', TRUE, ''),
 ('Insects with Whey', 'BRIT', 'insect protein, peas, whey, potato starch, pea protein, coconut oil, linseed, dried algae (schizochytrium), hydrolyzed chicken liver, dried apple pulp, rapeseed oil, lactobacillus acidophilus', TRUE, ''),
 ('MAXI Adult 5+ Large breed', 'Royal Canin', 'dehydrated poultry proteins, animal fats, maize, wheat meal, wheat flour, barley, maize gluten, wheat gluten, hydrolysed animal proteins, beet pulp, minerals, fish oil, soya oil, yeast products, psyllium husks and seeds, fructo-oligosaccharides, algal oil (schizochytrium), glucosamine, hydrolysed cartilage', TRUE, 'B00CW4XSV0'),
