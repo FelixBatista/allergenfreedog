@@ -258,8 +258,16 @@
       transform: rotate(-45deg) translate(6px, -6px);
     }
     
+    /* Hide mobile-only elements on desktop */
+    .mobile-only {
+      display: none;
+    }
+    
     /* Mobile responsive */
     @media (max-width: 768px) {
+      .mobile-only {
+        display: inline-flex;
+      }
       /* Mobile menu */
       .mobile-menu-toggle {
         display: flex;
@@ -874,8 +882,9 @@
       <div class="actions" id="navActions">
         <button class="btn ghost" id="openGlossary">Ingredient Glossary</button>
         <a class="btn ghost" href="allergy-testing.html">Allergy Testing Guide</a>
+        <a class="btn ghost" href="dog-allergy-tests.html">Dog Allergy Tests</a>
         <a class="btn ghost" href="/blog">Blog</a>
-        <button class="btn ghost" onclick="startMobileAppFlow()" id="showTutorialBtn">Show Tutorial</button>
+        <button class="btn ghost mobile-only" onclick="startMobileAppFlow()" id="showTutorialBtn">Show Tutorial</button>
         <button class="btn" id="loginBtn" style="display: none; background: #4285f4; color: white; border: none;">Log In</button>
         <div id="userInfo" style="display: none;">
           <div id="userProfile" class="user-profile">
@@ -889,7 +898,6 @@
             </div>
           </div>
         </div>
-        <a class="btn primary" href="#compare">Compare Now</a>
       </div>
     </div>
   </header>
@@ -2386,6 +2394,9 @@
           currentDogId = null;
           userDogs = [];
           updateAuthUI(false);
+          
+          // Auto-start mobile app flow for non-logged-in users on mobile devices
+          autoStartMobileAppFlow();
         }
       });
 
@@ -3318,6 +3329,11 @@
       return 'data:image/svg+xml,<svg width="1" height="1" xmlns="http://www.w3.org/2000/svg"></svg>';
     }
 
+    // Helper function to check if picture_url is valid (not null, undefined, or empty string)
+    function hasValidPictureUrl(pictureUrl) {
+      return pictureUrl && pictureUrl.trim() !== '';
+    }
+
     // Function to find safe food suggestions based on problematic non-overlapping ingredients
     function findSafeFoodSuggestions(nonOverlappingIngredients, comparisonData) {
       if (!nonOverlappingIngredients || nonOverlappingIngredients.length === 0) {
@@ -3374,8 +3390,9 @@
         <a href="${generateAffiliateLink(product)}" target="_blank" rel="noopener noreferrer" class="product-card">
           <div class="product-image">
             <img alt="${product.name}" 
-                 style="width: 100%; height: 100%; object-fit: cover;">
-            <div style="display: flex; align-items: center; justify-content: center; height: 100%; background: linear-gradient(135deg, ${getProductColor(product)}, ${getProductColor(product, true)}); color: white; font-size: 48px; flex-direction: column;">
+                 src="${hasValidPictureUrl(product.picture_url) ? product.picture_url : getFallbackImageUrl(product)}"
+                 style="width: 100%; height: 100%; object-fit: cover; ${hasValidPictureUrl(product.picture_url) ? '' : 'display: none;'}">
+            <div style="display: flex; align-items: center; justify-content: center; height: 100%; background: linear-gradient(135deg, ${getProductColor(product)}, ${getProductColor(product, true)}); color: white; font-size: 48px; flex-direction: column; ${hasValidPictureUrl(product.picture_url) ? 'display: none;' : ''}">
               <span>🐕</span>
               <span style="font-size: 12px; margin-top: 8px; text-align: center; padding: 0 8px;">${product.brand}</span>
             </div>
@@ -3390,17 +3407,31 @@
         </a>
       `).join('');
 
-      // Load Amazon images for products with ASINs
+      // Load Amazon images for products with ASINs or handle picture_url
       safeProducts.forEach(async (product, index) => {
         const productCard = suggestionsGrid.children[index];
         const img = productCard.querySelector('img');
         const fallback = productCard.querySelector('.product-image > div');
         
-        if (product.asin) {
+        if (hasValidPictureUrl(product.picture_url)) {
+          // Use the picture_url from database
+          img.style.display = 'block';
+          fallback.style.display = 'none';
+          img.src = product.picture_url;
+          img.onerror = function() {
+            // If picture_url fails to load, fall back to Amazon image or default
+            if (product.asin) {
+              loadAmazonImage(img, product);
+            } else {
+              img.style.display = 'none';
+              fallback.style.display = 'flex';
+            }
+          };
+        } else if (product.asin) {
           // Try to load Amazon image
           await loadAmazonImage(img, product);
         } else {
-          // No ASIN, show fallback immediately
+          // No picture_url or ASIN, show fallback immediately
           img.style.display = 'none';
           fallback.style.display = 'flex';
         }
@@ -3498,8 +3529,8 @@
     }
 
     function autoStartMobileAppFlow() {
-      // Only show mobile app flow on mobile devices if user is not logged in
-      if (window.innerWidth <= 768 && !auth.currentUser) {
+      // Only show mobile app flow on mobile devices if user is not logged in and hasn't completed it before
+      if (window.innerWidth <= 768 && !auth.currentUser && !localStorage.getItem('mobileAppCompleted')) {
         console.log('Auto-starting mobile app flow for mobile device...');
         document.getElementById('mobileAppFlow').style.display = 'block';
         document.body.style.overflow = 'hidden';
@@ -3866,10 +3897,7 @@
     }
 
     // Initialize page on load
-    document.addEventListener('DOMContentLoaded', function() {
-      // Auto-start mobile app flow on mobile devices
-      autoStartMobileAppFlow();
-    });
+    // Note: Mobile app flow auto-start is now handled in the auth state change listener
 
 
 
