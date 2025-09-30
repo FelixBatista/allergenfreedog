@@ -3329,6 +3329,11 @@
       return 'data:image/svg+xml,<svg width="1" height="1" xmlns="http://www.w3.org/2000/svg"></svg>';
     }
 
+    // Helper function to check if picture_url is valid (not null, undefined, or empty string)
+    function hasValidPictureUrl(pictureUrl) {
+      return pictureUrl && pictureUrl.trim() !== '';
+    }
+
     // Function to find safe food suggestions based on problematic non-overlapping ingredients
     function findSafeFoodSuggestions(nonOverlappingIngredients, comparisonData) {
       if (!nonOverlappingIngredients || nonOverlappingIngredients.length === 0) {
@@ -3385,9 +3390,9 @@
         <a href="${generateAffiliateLink(product)}" target="_blank" rel="noopener noreferrer" class="product-card">
           <div class="product-image">
             <img alt="${product.name}" 
-                 src="${product.picture_url || ''}"
-                 style="width: 100%; height: 100%; object-fit: cover; ${product.picture_url ? '' : 'display: none;'}">
-            <div style="display: flex; align-items: center; justify-content: center; height: 100%; background: linear-gradient(135deg, ${getProductColor(product)}, ${getProductColor(product, true)}); color: white; font-size: 48px; flex-direction: column; ${product.picture_url ? 'display: none;' : ''}">
+                 src="${hasValidPictureUrl(product.picture_url) ? product.picture_url : getFallbackImageUrl(product)}"
+                 style="width: 100%; height: 100%; object-fit: cover; ${hasValidPictureUrl(product.picture_url) ? '' : 'display: none;'}">
+            <div style="display: flex; align-items: center; justify-content: center; height: 100%; background: linear-gradient(135deg, ${getProductColor(product)}, ${getProductColor(product, true)}); color: white; font-size: 48px; flex-direction: column; ${hasValidPictureUrl(product.picture_url) ? 'display: none;' : ''}">
               <span>🐕</span>
               <span style="font-size: 12px; margin-top: 8px; text-align: center; padding: 0 8px;">${product.brand}</span>
             </div>
@@ -3408,7 +3413,7 @@
         const img = productCard.querySelector('img');
         const fallback = productCard.querySelector('.product-image > div');
         
-        if (product.picture_url) {
+        if (hasValidPictureUrl(product.picture_url)) {
           // Use the picture_url from database
           img.style.display = 'block';
           fallback.style.display = 'none';
