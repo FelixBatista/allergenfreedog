@@ -1,0 +1,17 @@
+node_modules/
+dist/
+.wrangler/
+.dev.vars*
+!.dev.vars.example
+.env*
+!.env.example
+work/
+coverage/
+*.local.json
+migration-private/
+public/blog/
+public/images/
+public/allergy-testing.html
+public/dog-allergy-tests.html
+public/sitemap.xml
+public/robots.txt

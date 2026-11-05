@@ -1,0 +1,48 @@
+{
+  "name": "dog-allergy-check-cloudflare",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite --host 127.0.0.1",
+    "build": "node scripts/content.mjs && vite build",
+    "preview": "wrangler dev",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "check": "npm run typecheck && npm test && npm run build",
+    "db:local": "wrangler d1 migrations apply DB --local",
+    "seed:local": "wrangler d1 execute DB --local --file database/seed.sql",
+    "deploy": "npm run check && node scripts/preflight.mjs && wrangler deploy && wrangler deploy --config wrangler.jobs.jsonc",
+    "import:legacy": "node scripts/import-legacy.mjs",
+    "prepare:content": "node scripts/content.mjs"
+  },
+  "dependencies": {
+    "better-auth": "^1.7.17",
+    "cheerio": "^1.2.0",
+    "drizzle-orm": "^0.45.4",
+    "fast-xml-parser": "^5.12.0",
+    "gray-matter": "^4.0.3",
+    "hono": "^4.13.16",
+    "marked": "^18.1.3",
+    "react": "^19.3.1",
+    "react-dom": "^19.3.1",
+    "robots-parser": "^3.0.1",
+    "sanitize-html": "^2.18.1",
+    "zod": "^4.6.7"
+  },
+  "devDependencies": {
+    "@cloudflare/vite-plugin": "^1.67.0",
+    "@cloudflare/workers-types": "^5.20261104.1",
+    "@types/node": "^26.6.6",
+    "@types/react": "^19.3.0",
+    "@types/react-dom": "^19.3.0",
+    "@types/sanitize-html": "^2.16.2",
+    "@vitejs/plugin-react": "^6.2.1",
+    "jsonc-parser": "^3.3.1",
+    "prettier": "^3.9.10",
+    "typescript": "^5.9.3",
+    "vite": "^8.3.5",
+    "vitest": "^5.1.0",
+    "wrangler": "^4.157.0"
+  }
+}

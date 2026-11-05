@@ -1,0 +1,80 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "dogallergycheck-staging-jobs",
+  "main": "src/jobs/index.ts",
+  "account_id": "5197cbc92b5db4a7abfaf76c38c6d0c5",
+  "compatibility_date": "2026-11-04",
+  "compatibility_flags": [
+    "nodejs_compat"
+  ],
+  "observability": {
+    "enabled": true
+  },
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "dogallergycheck-staging",
+      "database_id": "98d21899-f9cf-4218-a9e7-5178e234a6a3",
+      "migrations_dir": "migrations"
+    }
+  ],
+  "r2_buckets": [
+    {
+      "binding": "FILES",
+      "bucket_name": "dogallergycheck-staging-files"
+    }
+  ],
+  "queues": {
+    "producers": [
+      {
+        "binding": "JOBS",
+        "queue": "dogallergycheck-staging-jobs"
+      }
+    ],
+    "consumers": [
+      {
+        "queue": "dogallergycheck-staging-jobs",
+        "max_batch_size": 1,
+        "max_concurrency": 1,
+        "max_retries": 3,
+        "dead_letter_queue": "dogallergycheck-staging-failed"
+      }
+    ]
+  },
+  "workflows": [
+    {
+      "name": "dogallergycheck-staging-ingestion",
+      "binding": "INGESTION",
+      "class_name": "IngestionWorkflow"
+    }
+  ],
+  "triggers": {
+    "crons": [
+      "0 6 * * *",
+      "0 7 * * MON",
+      "0 7 * * TUE",
+      "0 7 * * WED",
+      "0 3 * * *"
+    ]
+  },
+  "vars": {
+    "APP_URL": "https://dogallergycheck-staging-web.felixb-neto.workers.dev",
+    "ADMIN_EMAILS": "felixb.neto@gmail.com",
+    "AI_ACCOUNT_ID": "",
+    "AI_GATEWAY_ID": "",
+    "AI_MODEL": "@cf/meta/llama-3.3-70b-instruct-fp8-fast",
+    "AI_MAX_CALL_USD": "0.10",
+    "AI_MONTHLY_USD": "20",
+    "AI_ENABLED": "true",
+    "MONTHLY_BUDGET_USD": "50",
+    "INFRA_RESERVE_USD": "20",
+    "AGENTS_ENABLED": "true",
+    "AUTO_PUBLISH": "false",
+    "NCBI_EMAIL": ""
+  },
+  "ai": {
+    "binding": "AI"
+  },
+  "workers_dev": false,
+  "preview_urls": false
+}
