@@ -9,6 +9,24 @@ import type { Env } from "./env";
 import { explain } from "../jobs/ai";
 type User = { id: string; email: string; name: string };
 const app = new Hono<{ Bindings: Env; Variables: { user: User } }>();
+app.use("*", async (c, next) => {
+  const canonical = new URL(c.env.APP_URL);
+  const requested = new URL(c.req.url);
+  if (
+    canonical.hostname === "dogallergycheck.com" &&
+    requested.origin !== canonical.origin &&
+    [
+      "dogallergycheck.com",
+      "www.dogallergycheck.com",
+      "dogallergycheck-staging-web.felixb-neto.workers.dev",
+    ].includes(requested.hostname)
+  ) {
+    canonical.pathname = requested.pathname;
+    canonical.search = requested.search;
+    return c.redirect(canonical.toString(), 308);
+  }
+  await next();
+});
 app.use(
   "*",
   secureHeaders({

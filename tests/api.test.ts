@@ -51,6 +51,22 @@ async function user(id: string) {
     .run();
 }
 describe("API security and storage", () => {
+  it("redirects alternate production hosts to HTTPS apex with path and query intact", async () => {
+    for (const origin of [
+      "http://dogallergycheck.com",
+      "https://www.dogallergycheck.com",
+      "https://dogallergycheck-staging-web.felixb-neto.workers.dev",
+    ]) {
+      const r = await app.request(`${origin}/blog/?page=2`, {}, env);
+      expect(r.status).toBe(308);
+      expect(r.headers.get("location")).toBe(
+        "https://dogallergycheck.com/blog/?page=2",
+      );
+    }
+    env.APP_URL = "https://dogallergycheck-staging-web.felixb-neto.workers.dev";
+    const staging = await app.request(`${env.APP_URL}/api/v1/health`, {}, env);
+    expect(staging.status).toBe(200);
+  });
   it("serves immutable static responses with security headers", async () => {
     env.ASSETS.fetch = () =>
       Response.redirect("https://example.com/journal", 301);

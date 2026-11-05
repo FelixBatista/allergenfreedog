@@ -4,48 +4,40 @@
   "main": "src/server/index.ts",
   "account_id": "5197cbc92b5db4a7abfaf76c38c6d0c5",
   "compatibility_date": "2026-11-04",
-  "compatibility_flags": [
-    "nodejs_compat"
-  ],
+  "compatibility_flags": ["nodejs_compat"],
   "assets": {
     "directory": "./public",
     "binding": "ASSETS",
     "not_found_handling": "single-page-application",
-    "run_worker_first": [
-      "/api/*",
-      "/media/*",
-      "/blog/*",
-      "/allergy-testing.html",
-      "/dog-allergy-tests.html"
-    ]
+    "run_worker_first": true,
   },
   "observability": {
-    "enabled": true
+    "enabled": true,
   },
   "d1_databases": [
     {
       "binding": "DB",
       "database_name": "dogallergycheck-staging",
       "database_id": "98d21899-f9cf-4218-a9e7-5178e234a6a3",
-      "migrations_dir": "migrations"
-    }
+      "migrations_dir": "migrations",
+    },
   ],
   "r2_buckets": [
     {
       "binding": "FILES",
-      "bucket_name": "dogallergycheck-staging-files"
-    }
+      "bucket_name": "dogallergycheck-staging-files",
+    },
   ],
   "queues": {
     "producers": [
       {
         "binding": "JOBS",
-        "queue": "dogallergycheck-staging-jobs"
-      }
-    ]
+        "queue": "dogallergycheck-staging-jobs",
+      },
+    ],
   },
   "vars": {
-    "APP_URL": "https://dogallergycheck-staging-web.felixb-neto.workers.dev",
+    "APP_URL": "https://dogallergycheck.com",
     "ADMIN_EMAILS": "felixb.neto@gmail.com",
     "AI_ACCOUNT_ID": "",
     "AI_GATEWAY_ID": "",
@@ -56,11 +48,15 @@
     "MONTHLY_BUDGET_USD": "50",
     "INFRA_RESERVE_USD": "20",
     "AGENTS_ENABLED": "true",
-    "AUTO_PUBLISH": "false"
+    "AUTO_PUBLISH": "false",
   },
   "ai": {
-    "binding": "AI"
+    "binding": "AI",
   },
+  "routes": [
+    { "pattern": "dogallergycheck.com", "custom_domain": true },
+    { "pattern": "www.dogallergycheck.com", "custom_domain": true },
+  ],
   "workers_dev": true,
-  "preview_urls": false
+  "preview_urls": false,
 }

@@ -6,7 +6,7 @@ Web: https://dogallergycheck-staging-web.felixb-neto.workers.dev
 
 Cloudflare account: Felix's account. Staging has its own D1 database, private R2 bucket, job/dead-letter queues and Workflow. The original domain and hosting have not been changed.
 
-The checked-in configurations target staging, with collection and Workers AI enabled and automatic publication disabled. Google sign-in is configured with deployed secrets and has been exercised successfully. Administrator allowlisting never grants guest access.
+The deployed application remains on staging, with collection and Workers AI enabled and automatic publication disabled. Source configurations now prepare the production-domain cutover; they have not been deployed while DNS activation is pending. Google sign-in is configured with deployed secrets and has been exercised successfully. Administrator allowlisting never grants guest access. See DOMAIN-CUTOVER.md for registrar changes and deployment prerequisites.
 
 ## Verification
 
