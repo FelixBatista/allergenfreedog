@@ -11,7 +11,7 @@
 
 ## Agents and AI
 
-The deployed pilot has `AGENTS_ENABLED=true`, `AI_ENABLED=true` and `AUTO_PUBLISH=false`. It collects public evidence and proposes drafts without automatically publishing new products or scientific conclusions. Keep agents/AI off when preparing an unverified environment, then activate the reviewed pilot configuration deliberately.
+The deployed pilot has `AGENTS_ENABLED=true`, `AI_ENABLED=false` and `AUTO_PUBLISH=true`. With AI off, product ingestion can only use deterministic structured source data. Automatic publishing is limited to an existing product whose identity and ingredient list exactly match the source and pass verbatim checks. New products, changed labels, Open Pet Food Facts proposals, AI-derived extractions and scientific comments remain review-gated. Keep agents off when preparing an unverified environment.
 
 Use the administrator source form to record the source URL, permitted hostname, basis for access and separate image reuse permission. URLs must be HTTPS. Product discovery recognizes same-host `/product/` and `/products/` links; other catalogs need a connector before onboarding. Refresh tasks inspect existing source-linked products. A catalog listing can be collected manually through the source form's Collect button. The pilot is bounded to three sources and up to 100 newly discovered US variants per discovery run; existing legacy rows do not imply US availability.
 
@@ -23,13 +23,13 @@ External model configuration: `AI_ACCOUNT_ID`, `AI_GATEWAY_ID`, `AI_MODEL` (prov
 
 Optional browser extraction: set `BROWSER_ENABLED=true`, `CF_ACCOUNT_ID`, `CF_BROWSER_TOKEN` with Browser Run permission on jobs. Use it only for approved sources whose policies allow browser retrieval; each call reserves $0.05 estimated cost. Browser fallback uses the same permitted source URL. Sources requiring arbitrary navigation/authentication or restrictive access are unsupported.
 
-UTC schedules: daily refresh 06:00; Monday discovery 07:00; Tuesday PubMed discovery 07:00; Wednesday corrections/retractions 07:00; daily backup 03:00. Queue consumer concurrency is 1 with three delivery retries and a dead-letter queue. Each message starts a stable-ID Workflow, which handles its own step retries. Queue acceptance is not a completed job. Failed workflows appear in the panel; re-run via the source Collect action or the Cloudflare Workflow dashboard, inspecting idempotency before replay.
+UTC schedules: daily refresh 06:00; Monday discovery 07:00; Tuesday PubMed discovery 07:00; Wednesday corrections/retractions 07:00. Scheduled SQL backups are disabled by owner preference. Queue consumer concurrency is 1 with three delivery retries and a dead-letter queue. Each message starts a stable-ID Workflow, which handles its own step retries. Queue acceptance is not a completed job. Failed workflows appear in the panel; re-run via the source Collect action or the Cloudflare Workflow dashboard, inspecting idempotency before replay.
 
 New products, AI extractions and material label changes require review. Only unchanged, fully verified structured labels may auto-publish. New scientific meaning always requires a qualified human reviewer. Source snapshots and product versions are retained; ingestion does not rewrite saved comparison results.
 
 ## Backups and incidents
 
-The deployed database has D1 Time Travel for point-in-time recovery, and a verified SQL export is kept in the ignored private migration directory. An additional scheduled SQL copy to R2 requires `CF_ACCOUNT_ID`, `CF_DATABASE_ID` and a separately scoped secret `CF_BACKUP_TOKEN` with D1 export rights on jobs; that token is not currently configured. When configured, the backup workflow writes to private R2 `backups/YYYY-MM-DD.sql` with 30-day retention. Source pages, research XML and backups are never served by the public media endpoint. Product images are served only if a published product references the object and permission is recorded.
+The deployed database uses D1 Time Travel for point-in-time recovery (seven days on Workers Free). A verified SQL export from cutover remains in the ignored private migration directory. By owner preference, no scheduled SQL copy to R2 is configured. R2 remains in use for application files and reviewed product images; its standard class has a monthly free allowance, with usage charges above it. Source pages and research XML are never served by the public media endpoint. Product images are served only if a published product references the object and permission is recorded.
 
 Restore test: download a backup into an ignored `migration-private/` directory using Wrangler R2, import it into a **new disposable D1 database**, compare table counts/ownership/version snapshots, then point an isolated staging deployment at it. Never test restores against production. Record the date and result. Use D1 Time Travel for additional recovery.
 

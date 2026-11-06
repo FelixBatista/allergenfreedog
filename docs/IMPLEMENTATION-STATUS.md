@@ -6,7 +6,7 @@ Website: https://dogallergycheck.com
 
 Cloudflare is the authoritative DNS host. The production Worker serves the apex and `www` custom domains, and the scheduled jobs Worker is deployed. The original InfinityFree A records and its ACME challenge record have been removed, so the public domain no longer routes to InfinityFree. The old account and files are retained temporarily for rollback.
 
-The production hostname uses the previously verified Cloudflare D1, private R2 bucket, job/dead-letter queues and Workflow. Their resource names still contain `staging`; they were promoted in place to preserve the tested data and authentication secrets. Google sign-in was exercised on the production domain, and the owner's two dogs and twenty saved comparisons loaded. Automatic publication remains disabled.
+The production hostname uses the previously verified Cloudflare D1, private R2 bucket, job/dead-letter queues and Workflow. Their resource names still contain `staging`; they were promoted in place to preserve the tested data and authentication secrets. Google sign-in was exercised on the production domain, and the owner's two dogs and twenty saved comparisons loaded. The owner asked to pause AI until product work is complete, so `AI_ENABLED=false` is deployed. Scheduled collectors remain active. `AUTO_PUBLISH=true` only allows unchanged, already-listed products whose structured source label passes exact-text checks; new/changed labels and scientific comments remain review-gated.
 
 ## Verification
 
@@ -24,7 +24,8 @@ The production hostname uses the previously verified Cloudflare D1, private R2 b
 
 - Keep the old hosting, Firebase and private exports for seven days. Public-domain traffic no longer reaches the old site. Reconcile any new D1 data before a rollback.
 - D1 point-in-time recovery and the verified SQL export are available. Scheduled SQL exports to private R2 still require a separately scoped Cloudflare API token; none is installed as a long-lived Worker secret.
-- Full model qualification remains outstanding. Keep `AUTO_PUBLISH=false`; complete the qualification and human review before increasing autonomy or publishing generated claims.
+- Full model qualification remains outstanding. AI is disabled. Complete qualification before re-enabling AI or increasing publication autonomy.
+- Scheduled SQL backups to R2 are disabled by owner preference. D1 Time Travel on Workers Free retains seven days, and a verified cutover export is kept locally in the ignored private directory.
 - The wildcard `*.dogallergycheck.com` parking record still points to Bodis, and the existing MX record was preserved. These are not used for the apex/www application. Confirm mail use before changing MX.
 
 For runbooks, see `DOMAIN-CUTOVER.md`, `OPERATIONS.md`, `MIGRATION.md` and `AI-EVALUATION.md`.

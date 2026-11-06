@@ -44,11 +44,11 @@
     "AI_MODEL": "@cf/meta/llama-3.3-70b-instruct-fp8-fast",
     "AI_MAX_CALL_USD": "0.10",
     "AI_MONTHLY_USD": "20",
-    "AI_ENABLED": "true",
+    "AI_ENABLED": "false",
     "MONTHLY_BUDGET_USD": "20",
     "INFRA_RESERVE_USD": "0",
     "AGENTS_ENABLED": "true",
-    "AUTO_PUBLISH": "false",
+    "AUTO_PUBLISH": "true",
   },
   "ai": {
     "binding": "AI",

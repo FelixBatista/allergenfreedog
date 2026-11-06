@@ -7,7 +7,7 @@
 - STRATO delegates to `rajeev.ns.cloudflare.com` and `saanvi.ns.cloudflare.com`.
 - Apex and `www` are attached as Cloudflare Worker custom domains. Cloudflare manages their DNS records and certificates.
 - Web Worker: `dogallergycheck-staging-web`, serving production at `https://dogallergycheck.com`.
-- Scheduled worker: `dogallergycheck-staging-jobs`; product/science collection remains review-first, with `AUTO_PUBLISH=false`.
+- Scheduled worker: `dogallergycheck-staging-jobs`; collectors remain enabled, AI is disabled by owner request, and auto-publishing is limited to unchanged existing products with exact-validated structured labels. New/changed products and scientific comments remain review-gated.
 - The existing apex and `www` A records to InfinityFree (`185.27.134.215`) and the InfinityFree `_acme-challenge` CNAME were removed. Cloudflare now routes apex and `www` to the Worker. The InfinityFree hosting account/files remain available for rollback, but the domain no longer points to that web host.
 - Preserved the existing MX, CAA and wildcard parking records. The wildcard `*.dogallergycheck.com` still points to Bodis; this is unrelated to the apex/www application routes. Do not remove MX until the domain's email use is known.
 - Added DNS TXT validation records requested by Cloudflare for Google Trust Services certificates. Confirm certificate status in Cloudflare if troubleshooting TLS.
@@ -28,6 +28,6 @@
 
 - Keep the old InfinityFree hosting, Firebase project and private exports for at least seven days. The site no longer writes to those services through the public domain. Before a rollback after new production writes, export D1 and reconcile those changes; do not simply point DNS at the old app.
 - Google OAuth production origin and callback are configured. Existing staging OAuth entries and Worker credentials were retained.
-- D1's own point-in-time recovery and the verified SQL export are available. Scheduled copy-to-R2 backups still require a separately scoped Cloudflare API token; this token is not configured as a Worker secret.
+- D1's own seven-day point-in-time recovery on the Free plan and the verified SQL export are available. Scheduled copy-to-R2 backups are disabled by owner preference; no backup token is configured.
 - The Worker and its D1/bucket/queue resources retain `staging` in their names, but the verified resources now serve the production hostname. Renaming or separating these requires a planned data/resource migration.
 - Keep automatic publication disabled. Complete the model qualification and human review process before increasing AI autonomy or publishing generated claims.
