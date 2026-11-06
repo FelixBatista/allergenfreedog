@@ -1,30 +1,33 @@
-# dogallergycheck.com cutover
+# dogallergycheck.com production cutover
 
-## Prepared 5 November 2026
+## Completed — 6 November 2026
 
 - Registrar: STRATO (registry registrar Cronon GmbH).
-- Cloudflare account: `5197cbc92b5db4a7abfaf76c38c6d0c5`.
-- Cloudflare DNS zone `86f5d39074c82a3c716a5edfbed56cba` created on the Free plan; activation awaits registrar propagation.
-- Assigned authoritative servers: `rajeev.ns.cloudflare.com`, `saanvi.ns.cloudflare.com`.
-- Existing apex and www A records: `185.27.134.215` (InfinityFree). Keep these DNS-only until the Worker cutover is ready.
-- Imported 25 DNS records: 2 A, 2 CNAME, 20 CAA, 1 MX. Certificate validation `_acme-challenge` and legacy wildcard parking CNAME remain DNS-only. Existing CAA and MX records were preserved.
-- Existing public delegation includes `ns1.byet.org` through `ns5.byet.org` and `ns1.infinityfree.com`, `ns2.infinityfree.com`. Preserve this list for rollback; registrar must delegate only to the two assigned Cloudflare servers.
-- No DNSSEC DS record was returned by the public resolver during preparation. Verify registrar DNSSEC status before nameserver replacement; do not remove an existing DS without handling the DNSSEC transition.
-- Google OAuth client was saved with the additional origin `https://dogallergycheck.com` and redirect `https://dogallergycheck.com/api/auth/callback/google`; existing staging entries were retained.
-- No domain registration transfer, paid plan, or new billing subscription was requested or enabled.
+- Authoritative DNS: Cloudflare zone `dogallergycheck.com` (Free plan), active in Felix's account.
+- STRATO delegates to `rajeev.ns.cloudflare.com` and `saanvi.ns.cloudflare.com`.
+- Apex and `www` are attached as Cloudflare Worker custom domains. Cloudflare manages their DNS records and certificates.
+- Web Worker: `dogallergycheck-staging-web`, serving production at `https://dogallergycheck.com`.
+- Scheduled worker: `dogallergycheck-staging-jobs`; product/science collection remains review-first, with `AUTO_PUBLISH=false`.
+- The existing apex and `www` A records to InfinityFree (`185.27.134.215`) and the InfinityFree `_acme-challenge` CNAME were removed. Cloudflare now routes apex and `www` to the Worker. The InfinityFree hosting account/files remain available for rollback, but the domain no longer points to that web host.
+- Preserved the existing MX, CAA and wildcard parking records. The wildcard `*.dogallergycheck.com` still points to Bodis; this is unrelated to the apex/www application routes. Do not remove MX until the domain's email use is known.
+- Added DNS TXT validation records requested by Cloudflare for Google Trust Services certificates. Confirm certificate status in Cloudflare if troubleshooting TLS.
+- No registration transfer, paid plan or subscription was made.
 
-## Registrar change saved — 5 November 2026
+## Production verification
 
-STRATO confirmed that the two assigned Cloudflare nameservers were saved and sent to the registry. The old nameservers in slots 3 and 4 were cleared. The registry RDAP response still showed `ns1.byet.org` through `ns4.byet.org` during the final check, and Cloudflare still reported `pending`; this is propagation, not a completed application cutover.
+- `https://dogallergycheck.com/api/v1/health` returns HTTP 200 and engine version 2.0.0.
+- HTTP and `www` requests return a permanent redirect to the HTTPS apex, preserving path and query string.
+- The legacy URL `/dog-allergy-tests.html?i=1` serves the migrated page after Cloudflare's `.html` canonical redirect.
+- `/blog/` and the allergy-testing guide return the migrated static content.
+- Google sign-in succeeded on the production hostname; the owner's two dogs and twenty saved comparisons appeared.
+- The D1 SQL export passed SQLite integrity/foreign-key checks: 40 products, 113 ingredients, 7 dogs, 20 comparisons.
+- Fresh Firebase Auth and Firestore exports on 6 November matched the earlier pre-cutover snapshots: 4 Google identities and 31 Firestore documents, including the same 7 dogs and 20 comparisons. The InfinityFree catalog export is from 5 November; catalog reconciliation found 40 products and no additions or changes against D1.
+- `npm run deploy` completed for both web and scheduled workers. Type checking, build and 22 automated tests passed as part of the deployment command.
 
-The production Worker configuration and canonical-host redirect are prepared in source but **have not been deployed** while the zone is pending. The existing deployed staging application remains available. `npm run check` passed (22 tests, type checking and build), and the production deploy dry-run passed. Both apex and www custom domains are declared in `wrangler.jsonc`, with the application URL set to the apex. The resource names still contain `staging`; this plan promotes the validated deployment without copying private authentication secrets or duplicating the database.
+## Rollback and remaining operations
 
-Fresh Firebase exports contained the same 4 identities, 7 dogs and 20 comparisons; all 31 Firestore documents (including missing ancestors) matched the previous export after key-order normalization. The D1 pre-cutover backup was restored and checked successfully (40 products, 113 ingredients, 7 dogs, 20 comparisons). Old-source writes are not yet frozen; repeat reconciliation at actual cutover. Private exports and backups remain ignored under `migration-private/`.
-
-## Remaining steps
-
-1. Wait for the saved STRATO nameserver change to reach the registry and confirm Cloudflare Active status. Do not resubmit the same change repeatedly.
-2. Follow MIGRATION.md release gates: freeze old writes, take final exports and pre-cutover D1 backup, reconcile source counts and new records without replacing staging users' new records.
-3. Attach apex and www as Worker custom domains. Preserve MX and other non-web records. Set the canonical application/auth URL to `https://dogallergycheck.com` and redirect alternate web hostnames to it. Reconcile these settings in source configuration before deployment.
-4. Verify DNS, certificate issuance, HTTP-to-HTTPS/canonical redirects, API health, comparison, Google login, dog/history ownership and legacy content URLs. Do not call nameserver delegation alone a completed application cutover.
-5. Retain old hosting and exports for at least seven days. If rolling back after new D1 writes, first export and reconcile those writes as documented in MIGRATION.md.
+- Keep the old InfinityFree hosting, Firebase project and private exports for at least seven days. The site no longer writes to those services through the public domain. Before a rollback after new production writes, export D1 and reconcile those changes; do not simply point DNS at the old app.
+- Google OAuth production origin and callback are configured. Existing staging OAuth entries and Worker credentials were retained.
+- D1's own point-in-time recovery and the verified SQL export are available. Scheduled copy-to-R2 backups still require a separately scoped Cloudflare API token; this token is not configured as a Worker secret.
+- The Worker and its D1/bucket/queue resources retain `staging` in their names, but the verified resources now serve the production hostname. Renaming or separating these requires a planned data/resource migration.
+- Keep automatic publication disabled. Complete the model qualification and human review process before increasing AI autonomy or publishing generated claims.

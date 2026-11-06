@@ -1,35 +1,30 @@
-# Implementation status — 5 November 2026
+# Implementation status — 6 November 2026
 
-## Published staging
+## Production
 
-Web: https://dogallergycheck-staging-web.felixb-neto.workers.dev
+Website: https://dogallergycheck.com
 
-Cloudflare account: Felix's account. Staging has its own D1 database, private R2 bucket, job/dead-letter queues and Workflow. The original domain and hosting have not been changed.
+Cloudflare is the authoritative DNS host. The production Worker serves the apex and `www` custom domains, and the scheduled jobs Worker is deployed. The original InfinityFree A records and its ACME challenge record have been removed, so the public domain no longer routes to InfinityFree. The old account and files are retained temporarily for rollback.
 
-The deployed application remains on staging, with collection and Workers AI enabled and automatic publication disabled. Source configurations now prepare the production-domain cutover; they have not been deployed while DNS activation is pending. Google sign-in is configured with deployed secrets and has been exercised successfully. Administrator allowlisting never grants guest access. See DOMAIN-CUTOVER.md for registrar changes and deployment prerequisites.
+The production hostname uses the previously verified Cloudflare D1, private R2 bucket, job/dead-letter queues and Workflow. Their resource names still contain `staging`; they were promoted in place to preserve the tested data and authentication secrets. Google sign-in was exercised on the production domain, and the owner's two dogs and twenty saved comparisons loaded. Automatic publication remains disabled.
 
 ## Verification
 
-- Type checking, production build and 21 automated tests pass.
-- Guest comparison was exercised in the browser, including wheat versus buckwheat, and API authorization was checked remotely.
-- The D1 seed contains 113 canonical ingredient names and 37 historical products, explicitly unverified as current US formulations.
-- Eleven journal pages and the legacy testing landing pages are generated as sanitized static HTML.
-- A staging SQL backup was exported, copied into private R2 and restored into an isolated in-memory SQLite database: 37 products and 113 ingredients recovered.
-- Initial source collection is a bounded US Open Pet Food Facts API connector; new records and photos are held for review with attribution. Manufacturer HTML/JSON-LD collection and AI extraction are also implemented, with source permissions and rate limits.
-- The first successful product Workflow collected five US products and five private review photos. The scientific Workflow completed with ten article records and two pending comment drafts. No new products or comments were automatically published.
-- A real message sent through Cloudflare Queues started and completed the correction/retraction Workflow (23 steps). Scientific processing and correction checks now checkpoint each article separately, with spacing and retries, to stay within provider and Worker request limits.
-- Scientific collection supports PubMed metadata/abstracts, reusable-license PMC full-text excerpts, AI drafts, and Crossref/PubMed correction checks. Every scientific draft needs review.
+- Production health endpoint returns HTTP 200 with comparison engine version 2.0.0.
+- HTTP and `www` canonicalize to HTTPS apex while preserving legacy paths and query parameters.
+- The legacy testing page, allergy guide and journal serve from Cloudflare static assets.
+- Fresh Firebase Auth and Firestore exports on 6 November matched the verified pre-cutover snapshots: four Google identities, seven dogs and twenty comparisons. All 31 Firestore documents, including missing ancestors, were retained.
+- The last InfinityFree MySQL export (5 November) had 40 products and 113 canonical ingredients. Reconciliation found no product additions or changes before cutover. All historical labels remain explicitly unverified as current formulations.
+- The live D1 backup passed SQLite integrity/foreign-key validation and contains 40 products, 113 ingredients, seven dogs and twenty comparisons.
+- Web and scheduled Workers both deployed. The deploy command passed type checking, 22 automated tests, production build and configuration preflight.
+- Google OAuth production origin and callback are configured; staging OAuth entries were kept.
+- The application exposes a bounded US Open Pet Food Facts connector, permitted manufacturer HTML/JSON-LD collection, review-only photo proposals, PubMed metadata/abstract collection, reusable-license PMC excerpts, AI-assisted drafts and correction/retraction checks. Scheduled collection is enabled; products and scientific comments remain review-gated.
 
-## Deferred operational steps
+## Operations still to complete
 
-On 5 November, authorized live exports were obtained from InfinityFree MySQL, Firebase Authentication and Firestore. Four verified Google identity mappings, seven dogs and twenty comparisons were imported into staging. The current MySQL catalog has forty products; three missing from the historical seed were added, with no ingredient changes to the other thirty-seven. All historical labels remain unverified. MySQL user/profile/history tables were empty; Firestore held the profiles and comparisons, including subcollections under missing ancestor documents.
+- Keep the old hosting, Firebase and private exports for seven days. Public-domain traffic no longer reaches the old site. Reconcile any new D1 data before a rollback.
+- D1 point-in-time recovery and the verified SQL export are available. Scheduled SQL exports to private R2 still require a separately scoped Cloudflare API token; none is installed as a long-lived Worker secret.
+- Full model qualification remains outstanding. Keep `AUTO_PUBLISH=false`; complete the qualification and human review before increasing autonomy or publishing generated claims.
+- The wildcard `*.dogallergycheck.com` parking record still points to Bodis, and the existing MX record was preserved. These are not used for the apex/www application. Confirm mail use before changing MX.
 
-The owner's Google account recovered its two dogs and all twenty comparisons in the browser; a historical comparison opened successfully. Other owners' dogs remain linked to their own Google subjects and are claimed on sign-in. Original comparison fields are retained in `result.legacySnapshot`, alongside a current-engine recomputation for UI compatibility. Old sessions are not migrated. Foreign key validation passed. Private raw exports and before-migration D1 backup are in ignored `migration-private/`; never commit them.
-
-The production domain has not been switched. The old site can still receive new writes; take a fresh export and reconcile changes during cutover.
-
-Recurring SQL backups and optional Browser Run require separately scoped runtime credentials; the developer's temporary Wrangler OAuth token is deliberately not installed as a long-lived application secret. The first manual backup/restore succeeded. The scheduled backup reports missing configuration until a runtime export token is added.
-
-External AI providers are supported through AI Gateway but require their Gateway/provider credentials. The staging pilot uses a Cloudflare-hosted model; the full model qualification suite is documented and is still required before automatic publication or production promotion. An adversarial manual smoke test produced an invented ingredient; the source-verbatim validator and review requirement are therefore essential. Structured output and runtime schema validation do not establish scientific truth.
-
-For ongoing setup and release gates see OPERATIONS.md, MIGRATION.md and AI-EVALUATION.md. Do not describe staging deployment as a completed production migration.
+For runbooks, see `DOMAIN-CUTOVER.md`, `OPERATIONS.md`, `MIGRATION.md` and `AI-EVALUATION.md`.

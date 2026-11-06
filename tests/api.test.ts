@@ -18,8 +18,8 @@ beforeEach(() => {
     APP_URL: "https://dogallergycheck.com",
     ADMIN_EMAILS: "admin@example.com",
     AI_MODEL: "test",
-    MONTHLY_BUDGET_USD: "50",
-    INFRA_RESERVE_USD: "20",
+    MONTHLY_BUDGET_USD: "20",
+    INFRA_RESERVE_USD: "0",
     AI_MONTHLY_USD: "20",
     ASSETS: { fetch: () => new Response("asset") },
   };
